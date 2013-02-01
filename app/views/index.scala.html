@@ -1,0 +1,15 @@
+@(profile : org.pac4j.core.profile.CommonProfile, urlFacebook: String, urlTwitter: String)
+<h1>index</h1>
+<a href="facebook/index.html">facebook/index</a><br />
+<a href="twitter/index.html">twitter/index</a><br />
+<a href="form/index.html">form/index</a><br />
+<a href="basicauth/index.html">basicauth/index</a><br />
+<a href="cas/index.html">cas/index</a><br />
+<br />
+<a href="logout">logout</a>
+<br /><br />
+authentication : @profile
+<br /><br />
+<hr />
+<a href="@urlFacebook">Authenticate at Facebook</a><br />
+<a href="@urlTwitter">Authenticate at Twitter</a><br />
