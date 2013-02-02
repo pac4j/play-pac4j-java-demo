@@ -20,10 +20,9 @@ import java.util.Map;
 
 import org.pac4j.core.context.BaseResponseContext;
 import org.pac4j.core.util.CommonHelper;
-import org.pac4j.play.Config;
 import org.pac4j.play.Constants;
+import org.pac4j.play.StorageHelper;
 
-import play.cache.Cache;
 import play.mvc.Http.Request;
 import play.mvc.Http.Response;
 import play.mvc.Http.Session;
@@ -36,11 +35,14 @@ import play.mvc.Http.Session;
  */
 public class JavaWebContext extends BaseResponseContext {
     
-    private final Request request;
+    private Request request;
     
-    private final Response response;
+    private Response response;
     
-    private final Session session;
+    private Session session;
+    
+    protected JavaWebContext() {
+    }
     
     public JavaWebContext(final Request request, final Response response, final Session session) {
         this.request = request;
@@ -86,7 +88,7 @@ public class JavaWebContext extends BaseResponseContext {
     public Object getSessionAttribute(final String key) {
         String sessionId = this.session.get(Constants.SESSION_ID);
         if (CommonHelper.isNotBlank(sessionId)) {
-            return Cache.get(sessionId + "$" + key);
+            return StorageHelper.get(sessionId, key);
         }
         return null;
     }
@@ -95,10 +97,11 @@ public class JavaWebContext extends BaseResponseContext {
     public void setSessionAttribute(final String key, final Object value) {
         String sessionId = this.session.get(Constants.SESSION_ID);
         if (CommonHelper.isNotBlank(sessionId)) {
-            Cache.set(sessionId + "$" + key, value, Config.getSessionTimeout());
+            StorageHelper.save(sessionId, key, value);
         }
     }
     
+    @Override
     public void setResponseHeader(final String name, final String value) {
         this.response.setHeader(name, value);
     }

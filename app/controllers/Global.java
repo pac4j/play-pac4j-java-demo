@@ -18,14 +18,14 @@ import play.mvc.Result;
 public class Global extends GlobalSettings {
     
     @Override
-    public Result onError(final RequestHeader arg0, final Throwable arg1) {
+    public Result onError(final RequestHeader requestHeader, final Throwable t) {
         return play.mvc.Controller.internalServerError(views.html.error500.render());
     }
     
     @Override
-    public void onStart(final Application arg0) {
-        CallbackController.setErrorPage401(CallbackController.unauthorized(views.html.error401.render()));
-        CallbackController.setErrorPage403(CallbackController.unauthorized(views.html.error403.render()));
+    public void onStart(final Application app) {
+        CallbackController.setErrorPage401(views.html.error401.render().toString());
+        CallbackController.setErrorPage403(views.html.error403.render().toString());
         
         // OAuth
         final FacebookClient facebookClient = new FacebookClient("132736803558924", "e461422527aeedb32ee6c10834d3e19e");

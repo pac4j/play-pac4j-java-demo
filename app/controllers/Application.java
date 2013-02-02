@@ -14,11 +14,11 @@ public class Application extends JavaController {
     public static Result index() throws TechnicalException {
         // profile (maybe null if not authenticated)
         final CommonProfile profile = profile();
-        final String urlFacebook = redirectUrl("FacebookClient");
-        final String urlTwitter = redirectUrl("TwitterClient");
-        final String urlForm = redirectUrl("FormClient");
-        final String urlBasicAuth = redirectUrl("BasicAuthClient");
-        final String urlCas = redirectUrl("CasClient");
+        final String urlFacebook = redirectionUrl("FacebookClient");
+        final String urlTwitter = redirectionUrl("TwitterClient");
+        final String urlForm = redirectionUrl("FormClient");
+        final String urlBasicAuth = redirectionUrl("BasicAuthClient");
+        final String urlCas = redirectionUrl("CasClient");
         return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas));
     }
     

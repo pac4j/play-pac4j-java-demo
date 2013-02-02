@@ -1,5 +1,5 @@
 /*
-  Copyright 2012 Jerome Leleu
+  Copyright 2012 - 2013 Jerome Leleu
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,10 +21,9 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.play.CallbackController;
 import org.pac4j.play.Config;
 import org.pac4j.play.Constants;
+import org.pac4j.play.StorageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import play.cache.Cache;
 
 /**
  * This controller is the Java controller to retrieve the user profile or the redirect url to start the authentication process.
@@ -40,12 +39,12 @@ public class JavaController extends CallbackController {
      * This method returns the url of the provider where the user must be redirected for authentication.<br />
      * The current requested url is saved into session to be restored after authentication.
      * 
-     * @param clientType
+     * @param clientName
      * @return the url of the provider where to redirect the user
      * @throws TechnicalException
      */
-    protected static String redirectUrl(final String clientType) throws TechnicalException {
-        return redirectUrl(clientType, null);
+    protected static String redirectionUrl(final String clientName) throws TechnicalException {
+        return redirectionUrl(clientName, null);
     }
     
     /**
@@ -53,20 +52,20 @@ public class JavaController extends CallbackController {
      * The input <code>targetUrl</code> (or the current requested url if <code>null</code>) is saved into session to be restored after
      * authentication.
      * 
-     * @param clientType
+     * @param clientName
      * @param targetUrl
      * @return the url of the provider where to redirect the user
      * @throws TechnicalException
      */
-    protected static String redirectUrl(final String clientType, final String targetUrl) throws TechnicalException {
-        // generate session id if necessary
-        CallbackController.generateSessionId(session());
-        // save requested url to session
-        final String savedRequestUrl = CallbackController.getRedirectUrl(targetUrl, request().uri());
-        logger.debug("savedRequestUrl : {}", savedRequestUrl);
-        session(Constants.REQUESTED_URL, savedRequestUrl);
+    protected static String redirectionUrl(final String clientName, final String targetUrl) throws TechnicalException {
+        // get or create session id
+        String sessionId = StorageHelper.getOrCreationSessionId(session());
+        // requested url to save
+        final String requestedUrlToSave = CallbackController.defaultUrl(targetUrl, request().uri());
+        logger.debug("requestedUrlToSave : {}", requestedUrlToSave);
+        StorageHelper.saveRequestedUrl(sessionId, clientName, requestedUrlToSave);
         // redirect to the provider for authentication
-        final String redirectUrl = Config.getClients().findClient(clientType)
+        final String redirectUrl = Config.getClients().findClient(clientName)
             .getRedirectionUrl(new JavaWebContext(request(), response(), session()));
         logger.debug("redirectUrl : {}", redirectUrl);
         return redirectUrl;
@@ -82,8 +81,8 @@ public class JavaController extends CallbackController {
         final String sessionId = session(Constants.SESSION_ID);
         logger.debug("sessionId for profile : {}", sessionId);
         if (StringUtils.isNotBlank(sessionId)) {
-            // get the user profile in cache
-            final CommonProfile profile = (CommonProfile) Cache.get(sessionId);
+            // get the user profile
+            final CommonProfile profile = StorageHelper.getProfile(sessionId);
             logger.debug("profile : {}", profile);
             return profile;
         }

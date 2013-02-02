@@ -1,5 +1,5 @@
 /*
-  Copyright 2012 Jerome Leleu
+  Copyright 2012 - 2013 Jerome Leleu
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,22 +19,21 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import org.apache.commons.lang3.StringUtils;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.play.CallbackController;
 import org.pac4j.play.Config;
 import org.pac4j.play.Constants;
+import org.pac4j.play.StorageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import play.cache.Cache;
 import play.mvc.Action;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 
 /**
- * This action checks if the user is not authenticated and starts the authentication process if necessary. *
+ * This action checks if the user is not authenticated and starts the authentication process if necessary.
  * 
  * @author Jerome Leleu
  * @since 1.0.0
@@ -66,25 +65,22 @@ public final class RequiresAuthenticationAction extends Action<Result> {
         logger.debug("clientName : {}", clientName);
         final String targetUrl = (String) invocationHandler.invoke(this.configuration, targetUrlMethod, null);
         logger.debug("targetUrl : {}", targetUrl);
-        final String sessionId = context.session().get(Constants.SESSION_ID);
+        // get or create session id
+        String sessionId = StorageHelper.getOrCreationSessionId(context.session());
         logger.debug("sessionId : {}", sessionId);
-        if (StringUtils.isNotBlank(sessionId)) {
-            final CommonProfile profile = (CommonProfile) Cache.get(sessionId);
-            logger.debug("profile : {}", profile);
-            if (profile != null) {
-                return this.delegate.call(context);
-            }
+        final CommonProfile profile = StorageHelper.getProfile(sessionId);
+        logger.debug("profile : {}", profile);
+        if (profile != null) {
+            return this.delegate.call(context);
         }
-        // generate session id if necessary
-        CallbackController.generateSessionId(context.session());
-        // save requested url to session
-        final String savedRequestUrl = CallbackController.getRedirectUrl(targetUrl, context.request().uri());
-        logger.debug("savedRequestUrl : {}", savedRequestUrl);
-        context.session().put(Constants.REQUESTED_URL, savedRequestUrl);
+        // requested url to save
+        final String requestedUrlToSave = CallbackController.defaultUrl(targetUrl, context.request().uri());
+        logger.debug("requestedUrlToSave : {}", requestedUrlToSave);
+        StorageHelper.saveRequestedUrl(sessionId, clientName, requestedUrlToSave);
         // get client
         final BaseClient client = (BaseClient) Config.getClients().findClient(clientName);
         logger.debug("client : {}", client);
-        // and compute redirection url
+        // and compute redirection url (force immediate redirect)
         final String redirectUrl = client.getRedirectionUrl(new JavaWebContext(context.request(), context.response(),
                                                                                context.session()), true);
         logger.debug("redirectUrl : {}", redirectUrl);

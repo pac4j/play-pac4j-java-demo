@@ -29,9 +29,7 @@ import org.pac4j.play.java.JavaWebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import play.cache.Cache;
 import play.mvc.Controller;
-import play.mvc.Http.Session;
 import play.mvc.Result;
 import play.mvc.Results;
 
@@ -47,9 +45,9 @@ public class CallbackController extends Controller {
     
     protected static final Logger logger = LoggerFactory.getLogger(CallbackController.class);
     
-    private static Result errorPage401 = unauthorized();
+    private static String errorPage401 = "authentication required";
     
-    private static Result errorPage403 = forbidden();
+    private static String errorPage403 = "forbidden";
     
     /**
      * This method handles the callback call from the provider to finish the authentication process. The credentials and then the profile of
@@ -80,7 +78,11 @@ public class CallbackController extends Controller {
             int code = context.getResponseStatus();
             logger.debug("HTTP action : {}", code);
             if (code == HttpConstants.UNAUTHORIZED) {
-                return errorPage401;
+                response().setContentType("text/html");
+                return unauthorized(errorPage401);
+            } else if (code == HttpConstants.FORBIDDEN) {
+                response().setContentType("text/html");
+                return forbidden(errorPage403);
             } else if (code == HttpConstants.TEMP_REDIRECT) {
                 return Results.status(HttpConstants.TEMP_REDIRECT);
             } else if (code == HttpConstants.OK) {
@@ -96,34 +98,15 @@ public class CallbackController extends Controller {
         final CommonProfile profile = (CommonProfile) client.getUserProfile(credentials);
         logger.debug("profile : {}", profile);
         
-        // genarte sessionId
-        String sessionId = generateSessionId(session());
-        // save user profile in cache
-        Cache.set(sessionId, profile, Config.getProfileTimeout());
+        // get or create sessionId
+        String sessionId = StorageHelper.getOrCreationSessionId(session());
+        // save user profile
+        StorageHelper.saveProfile(sessionId, profile);
+        // get requested url
+        String requestedUrl = StorageHelper.getRequestedUrl(sessionId, client.getName());
         
         // retrieve saved request and redirect
-        return redirect(getRedirectUrl(session(Constants.REQUESTED_URL), Config.getDefaultSuccessUrl()));
-    }
-    
-    /**
-     * Generate a session identifier if necessary.
-     * 
-     * @param session
-     * @return the session identifier
-     */
-    public static String generateSessionId(final Session session) {
-        // get current sessionId
-        String sessionId = session.get(Constants.SESSION_ID);
-        logger.debug("retrieved sessionId : {}", sessionId);
-        // if null, generate a new one
-        if (sessionId == null) {
-            // generate id for session
-            sessionId = java.util.UUID.randomUUID().toString();
-            logger.debug("generated sessionId : {}", sessionId);
-            // and save session
-            session.put(Constants.SESSION_ID, sessionId);
-        }
-        return sessionId;
+        return redirect(defaultUrl(requestedUrl, Config.getDefaultSuccessUrl()));
     }
     
     /**
@@ -135,8 +118,8 @@ public class CallbackController extends Controller {
         logger.debug("sessionId for logout : {}", sessionId);
         if (StringUtils.isNotBlank(sessionId)) {
             // remove user profile from cache
-            Cache.set(sessionId, null, 0);
-            logger.debug("remove user profile and sessionId : {}", sessionId);
+            StorageHelper.removeProfile(sessionId);
+            logger.debug("remove user profile for sessionId : {}", sessionId);
         }
         session().remove(Constants.SESSION_ID);
     }
@@ -166,38 +149,38 @@ public class CallbackController extends Controller {
         if (values != null && values.length == 1) {
             value = values[0];
         }
-        return redirect(getRedirectUrl(value, Config.getDefaultLogoutUrl()));
+        return redirect(defaultUrl(value, Config.getDefaultLogoutUrl()));
     }
     
     /**
-     * This method returns the redirect url from a specified url with a default url.
+     * This method returns the redirect url from a specified url compared with a default url.
      * 
      * @param url
      * @param defaultUrl
      * @return the redirect url
      */
-    public static String getRedirectUrl(final String url, final String defaultUrl) {
+    public static String defaultUrl(final String url, final String defaultUrl) {
         String redirectUrl = defaultUrl;
         if (StringUtils.isNotBlank(url)) {
             redirectUrl = url;
         }
-        logger.debug("compute redirectUrl : {}", redirectUrl);
+        logger.debug("defaultUrl : {}", redirectUrl);
         return redirectUrl;
     }
     
-    public static Result getErrorPage401() {
+    public static String getErrorPage401() {
         return errorPage401;
     }
     
-    public static void setErrorPage401(final Result errorPage401) {
+    public static void setErrorPage401(final String errorPage401) {
         CallbackController.errorPage401 = errorPage401;
     }
     
-    public static Result getErrorPage403() {
+    public static String getErrorPage403() {
         return errorPage403;
     }
     
-    public static void setErrorPage403(final Result errorPage403) {
+    public static void setErrorPage403(final String errorPage403) {
         CallbackController.errorPage403 = errorPage403;
     }
 }
