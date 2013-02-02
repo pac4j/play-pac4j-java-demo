@@ -19,17 +19,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.pac4j.core.context.BaseResponseContext;
+import org.pac4j.core.util.CommonHelper;
+import org.pac4j.play.Config;
 import org.pac4j.play.Constants;
-import org.scribe.model.Token;
 
+import play.cache.Cache;
 import play.mvc.Http.Request;
+import play.mvc.Http.Response;
 import play.mvc.Http.Session;
 
 /**
- * This class is the Java web context for Play.
- * <p />
- * For session management, it only handles String or Token objects as the Play session only stores String and thus requires a mapping from
- * Object to String.
+ * This class is the Java web context for Play. "Session objects" are stored into cache.
  * 
  * @author Jerome Leleu
  * @since 1.1.0
@@ -38,10 +38,13 @@ public class JavaWebContext extends BaseResponseContext {
     
     private final Request request;
     
+    private final Response response;
+    
     private final Session session;
     
-    public JavaWebContext(final Request request, final Session session) {
+    public JavaWebContext(final Request request, final Response response, final Session session) {
         this.request = request;
+        this.response = response;
         this.session = session;
     }
     
@@ -81,29 +84,22 @@ public class JavaWebContext extends BaseResponseContext {
     
     @Override
     public Object getSessionAttribute(final String key) {
-        final Object object = this.session.get(key);
-        if (object != null)
-            return object;
-        
-        final String secret = this.session.get(key + Constants.SECRET_SUFFIX_SESSION_PARAMETER);
-        final String token = this.session.get(key + Constants.TOKEN_SUFFIX_SESSION_PARAMETER);
-        if (secret != null || token != null)
-            return new Token(token, secret);
-        
+        String sessionId = this.session.get(Constants.SESSION_ID);
+        if (CommonHelper.isNotBlank(sessionId)) {
+            return Cache.get(sessionId + "$" + key);
+        }
         return null;
     }
     
     @Override
     public void setSessionAttribute(final String key, final Object value) {
-        if (value instanceof String) {
-            this.session.put(key, (String) value);
-        } else if (value instanceof Token) {
-            final Token scribeToken = (Token) value;
-            final String secret = scribeToken.getSecret();
-            this.session.put(key + Constants.SECRET_SUFFIX_SESSION_PARAMETER, secret);
-            final String token = scribeToken.getToken();
-            this.session.put(key + Constants.TOKEN_SUFFIX_SESSION_PARAMETER, token);
-        } else
-            throw new IllegalArgumentException("String and Token only supported in Play session");
+        String sessionId = this.session.get(Constants.SESSION_ID);
+        if (CommonHelper.isNotBlank(sessionId)) {
+            Cache.set(sessionId + "$" + key, value, Config.getSessionTimeout());
+        }
+    }
+    
+    public void setResponseHeader(final String name, final String value) {
+        this.response.setHeader(name, value);
     }
 }

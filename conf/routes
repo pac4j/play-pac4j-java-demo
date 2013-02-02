@@ -4,12 +4,12 @@
 
 # Home page
 GET     /                           controllers.Application.index()
-GET     /form                       controllers.Application.form()
+GET     /theForm                    controllers.Application.theForm()
 GET     /facebook/index.html        controllers.Application.facebookIndex()
 GET     /twitter/index.html         controllers.Application.twitterIndex()
 GET     /form/index.html            controllers.Application.formIndex()
 GET     /basicauth/index.html       controllers.Application.basicauthIndex()
 GET     /cas/index.html             controllers.Application.casIndex()
-GET     /callback                   org.pac4j.play.Controller.callback()
-POST    /callback                   org.pac4j.play.Controller.callback()
-GET     /logout                     org.pac4j.play.Controller.logoutAndRedirect()
+GET     /callback                   org.pac4j.play.CallbackController.callback()
+POST    /callback                   org.pac4j.play.CallbackController.callback()
+GET     /logout                     org.pac4j.play.CallbackController.logoutAndRedirect()

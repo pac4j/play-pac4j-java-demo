@@ -18,9 +18,9 @@ package org.pac4j.play.java;
 import org.apache.commons.lang3.StringUtils;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.play.CallbackController;
 import org.pac4j.play.Config;
 import org.pac4j.play.Constants;
-import org.pac4j.play.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ import play.cache.Cache;
  * @author Jerome Leleu
  * @since 1.0.0
  */
-public class JavaController extends Controller {
+public class JavaController extends CallbackController {
     
     protected static final Logger logger = LoggerFactory.getLogger(JavaController.class);
     
@@ -59,13 +59,15 @@ public class JavaController extends Controller {
      * @throws TechnicalException
      */
     protected static String redirectUrl(final String clientType, final String targetUrl) throws TechnicalException {
+        // generate session id if necessary
+        CallbackController.generateSessionId(session());
         // save requested url to session
-        final String savedRequestUrl = Controller.getRedirectUrl(targetUrl, request().uri());
+        final String savedRequestUrl = CallbackController.getRedirectUrl(targetUrl, request().uri());
         logger.debug("savedRequestUrl : {}", savedRequestUrl);
         session(Constants.REQUESTED_URL, savedRequestUrl);
         // redirect to the provider for authentication
         final String redirectUrl = Config.getClients().findClient(clientType)
-            .getRedirectionUrl(new JavaWebContext(request(), session()));
+            .getRedirectionUrl(new JavaWebContext(request(), response(), session()));
         logger.debug("redirectUrl : {}", redirectUrl);
         return redirectUrl;
     }

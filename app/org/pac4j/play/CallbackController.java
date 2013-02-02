@@ -30,7 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import play.cache.Cache;
+import play.mvc.Controller;
+import play.mvc.Http.Session;
 import play.mvc.Result;
+import play.mvc.Results;
 
 /**
  * This controller is the class to finish the authentication process and logout the user.
@@ -40,9 +43,13 @@ import play.mvc.Result;
  * @author Jerome Leleu
  * @since 1.0.0
  */
-public class Controller extends play.mvc.Controller {
+public class CallbackController extends Controller {
     
-    private static final Logger logger = LoggerFactory.getLogger(Controller.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CallbackController.class);
+    
+    private static Result errorPage401 = unauthorized();
+    
+    private static Result errorPage403 = forbidden();
     
     /**
      * This method handles the callback call from the provider to finish the authentication process. The credentials and then the profile of
@@ -59,7 +66,7 @@ public class Controller extends play.mvc.Controller {
         final Clients clientsGroup = Config.getClients();
         
         // web context
-        final JavaWebContext context = new JavaWebContext(request(), session());
+        final JavaWebContext context = new JavaWebContext(request(), response(), session());
         
         // get the client from its type
         final BaseClient client = (BaseClient) clientsGroup.findClient(context);
@@ -70,18 +77,18 @@ public class Controller extends play.mvc.Controller {
         try {
             credentials = client.getCredentials(context);
         } catch (final RequiresHttpAction e) {
-            if (context.getResponseStatus() == HttpConstants.TEMP_REDIRECT) {
-                final String redirectionUrl = context.getResponseHeaders().get(HttpConstants.LOCATION_HEADER);
-                logger.debug("HTTP action 302 to : {}", redirectionUrl);
-                return redirect(redirectionUrl);
-            } else if (context.getResponseStatus() == HttpConstants.UNAUTHORIZED) {
-                final String header = context.getResponseHeaders().get(HttpConstants.AUTHENTICATE_HEADER);
-                logger.debug("HTTP action 401 : {}", header);
-                response().getHeaders().put("WWW-Authenticate", header);
-                return unauthorized();
+            int code = context.getResponseStatus();
+            logger.debug("HTTP action : {}", code);
+            if (code == HttpConstants.UNAUTHORIZED) {
+                return errorPage401;
+            } else if (code == HttpConstants.TEMP_REDIRECT) {
+                return Results.status(HttpConstants.TEMP_REDIRECT);
+            } else if (code == HttpConstants.OK) {
+                return ok(context.getResponseContent());
             }
-            logger.debug("ok");
-            return ok();
+            String message = "Unsupported HTTP action : " + code;
+            logger.error(message);
+            throw new TechnicalException(message);
         }
         logger.debug("credentials : {}", credentials);
         
@@ -89,8 +96,24 @@ public class Controller extends play.mvc.Controller {
         final CommonProfile profile = (CommonProfile) client.getUserProfile(credentials);
         logger.debug("profile : {}", profile);
         
+        // genarte sessionId
+        String sessionId = generateSessionId(session());
+        // save user profile in cache
+        Cache.set(sessionId, profile, Config.getProfileTimeout());
+        
+        // retrieve saved request and redirect
+        return redirect(getRedirectUrl(session(Constants.REQUESTED_URL), Config.getDefaultSuccessUrl()));
+    }
+    
+    /**
+     * Generate a session identifier if necessary.
+     * 
+     * @param session
+     * @return the session identifier
+     */
+    public static String generateSessionId(final Session session) {
         // get current sessionId
-        String sessionId = session(Constants.SESSION_ID);
+        String sessionId = session.get(Constants.SESSION_ID);
         logger.debug("retrieved sessionId : {}", sessionId);
         // if null, generate a new one
         if (sessionId == null) {
@@ -98,13 +121,9 @@ public class Controller extends play.mvc.Controller {
             sessionId = java.util.UUID.randomUUID().toString();
             logger.debug("generated sessionId : {}", sessionId);
             // and save session
-            session(Constants.SESSION_ID, sessionId);
+            session.put(Constants.SESSION_ID, sessionId);
         }
-        // save userProfile in cache
-        Cache.set(sessionId, profile, Config.getCacheTimeout());
-        
-        // retrieve saved request and redirect
-        return redirect(getRedirectUrl(session(Constants.REQUESTED_URL), Config.getDefaultSuccessUrl()));
+        return sessionId;
     }
     
     /**
@@ -164,5 +183,21 @@ public class Controller extends play.mvc.Controller {
         }
         logger.debug("compute redirectUrl : {}", redirectUrl);
         return redirectUrl;
+    }
+    
+    public static Result getErrorPage401() {
+        return errorPage401;
+    }
+    
+    public static void setErrorPage401(final Result errorPage401) {
+        CallbackController.errorPage401 = errorPage401;
+    }
+    
+    public static Result getErrorPage403() {
+        return errorPage403;
+    }
+    
+    public static void setErrorPage403(final Result errorPage403) {
+        CallbackController.errorPage403 = errorPage403;
     }
 }

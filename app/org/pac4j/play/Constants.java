@@ -32,8 +32,4 @@ public interface Constants {
     public final static String CLIENT_NAME = "clientName";
     
     public final static String TARGET_URL = "targetUrl";
-    
-    public final static String SECRET_SUFFIX_SESSION_PARAMETER = "$secret";
-    
-    public final static String TOKEN_SUFFIX_SESSION_PARAMETER = "$token";
 }

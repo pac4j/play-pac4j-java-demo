@@ -22,9 +22,9 @@ import java.lang.reflect.Proxy;
 import org.apache.commons.lang3.StringUtils;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.play.CallbackController;
 import org.pac4j.play.Config;
 import org.pac4j.play.Constants;
-import org.pac4j.play.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,16 +75,18 @@ public final class RequiresAuthenticationAction extends Action<Result> {
                 return this.delegate.call(context);
             }
         }
+        // generate session id if necessary
+        CallbackController.generateSessionId(context.session());
         // save requested url to session
-        final String savedRequestUrl = Controller.getRedirectUrl(targetUrl, context.request().uri());
+        final String savedRequestUrl = CallbackController.getRedirectUrl(targetUrl, context.request().uri());
         logger.debug("savedRequestUrl : {}", savedRequestUrl);
         context.session().put(Constants.REQUESTED_URL, savedRequestUrl);
         // get client
         final BaseClient client = (BaseClient) Config.getClients().findClient(clientName);
         logger.debug("client : {}", client);
         // and compute redirection url
-        final String redirectUrl = client.getRedirectionUrl(new JavaWebContext(context.request(), context.session()),
-                                                            true);
+        final String redirectUrl = client.getRedirectionUrl(new JavaWebContext(context.request(), context.response(),
+                                                                               context.session()), true);
         logger.debug("redirectUrl : {}", redirectUrl);
         return redirect(redirectUrl);
     }
