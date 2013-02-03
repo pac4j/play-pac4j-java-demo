@@ -7,7 +7,6 @@ import org.pac4j.http.client.FormClient;
 import org.pac4j.http.credentials.SimpleTestUsernamePasswordAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
-import org.pac4j.play.CallbackController;
 import org.pac4j.play.Config;
 
 import play.Application;
@@ -24,8 +23,8 @@ public class Global extends GlobalSettings {
     
     @Override
     public void onStart(final Application app) {
-        CallbackController.setErrorPage401(views.html.error401.render().toString());
-        CallbackController.setErrorPage403(views.html.error403.render().toString());
+        Config.setErrorPage401(views.html.error401.render().toString());
+        Config.setErrorPage403(views.html.error403.render().toString());
         
         // OAuth
         final FacebookClient facebookClient = new FacebookClient("132736803558924", "e461422527aeedb32ee6c10834d3e19e");

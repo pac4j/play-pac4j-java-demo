@@ -13,18 +13,18 @@ public class Application extends JavaController {
     
     public static Result index() throws TechnicalException {
         // profile (maybe null if not authenticated)
-        final CommonProfile profile = profile();
-        final String urlFacebook = redirectionUrl("FacebookClient");
-        final String urlTwitter = redirectionUrl("TwitterClient");
-        final String urlForm = redirectionUrl("FormClient");
-        final String urlBasicAuth = redirectionUrl("BasicAuthClient");
-        final String urlCas = redirectionUrl("CasClient");
+        final CommonProfile profile = getUserProfile();
+        final String urlFacebook = getRedirectionUrl("FacebookClient");
+        final String urlTwitter = getRedirectionUrl("TwitterClient");
+        final String urlForm = getRedirectionUrl("FormClient");
+        final String urlBasicAuth = getRedirectionUrl("BasicAuthClient");
+        final String urlCas = getRedirectionUrl("CasClient");
         return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas));
     }
     
     private static Result protectedIndex() {
         // profile
-        final CommonProfile profile = profile();
+        final CommonProfile profile = getUserProfile();
         return ok(views.html.protectedIndex.render(profile));
     }
     

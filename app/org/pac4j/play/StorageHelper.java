@@ -72,7 +72,7 @@ public final class StorageHelper {
      */
     public static CommonProfile getProfile(final String sessionId) {
         if (sessionId != null) {
-            return (CommonProfile) Cache.get(sessionId);
+            return (CommonProfile) get(sessionId);
         }
         return null;
     }
@@ -85,7 +85,7 @@ public final class StorageHelper {
      */
     public static void saveProfile(final String sessionId, final CommonProfile profile) {
         if (sessionId != null) {
-            Cache.set(sessionId, profile, Config.getProfileTimeout());
+            save(sessionId, profile, Config.getProfileTimeout());
         }
     }
     
@@ -96,7 +96,7 @@ public final class StorageHelper {
      */
     public static void removeProfile(final String sessionId) {
         if (sessionId != null) {
-            Cache.set(sessionId, null, 0);
+            remove(sessionId);
         }
     }
     
@@ -131,7 +131,7 @@ public final class StorageHelper {
      */
     public static Object get(final String sessionId, final String key) {
         if (sessionId != null) {
-            return Cache.get(sessionId + SEPARATOR + key);
+            return get(sessionId + SEPARATOR + key);
         }
         return null;
     }
@@ -145,7 +145,37 @@ public final class StorageHelper {
      */
     public static void save(final String sessionId, final String key, final Object value) {
         if (sessionId != null) {
-            Cache.set(sessionId + SEPARATOR + key, value);
+            save(sessionId + SEPARATOR + key, value, Config.getSessionTimeout());
         }
+    }
+    
+    /**
+     * Get an object from storage.
+     * 
+     * @param key
+     * @return the object
+     */
+    public static Object get(final String key) {
+        return Cache.get(key);
+    }
+    
+    /**
+     * Save an object in storage.
+     * 
+     * @param key
+     * @param value
+     * @param timeout
+     */
+    public static void save(final String key, final Object value, final int timeout) {
+        Cache.set(key, value, timeout);
+    }
+    
+    /**
+     * Remove an object from storage.
+     * 
+     * @param key
+     */
+    public static void remove(final String key) {
+        save(key, null, 0);
     }
 }

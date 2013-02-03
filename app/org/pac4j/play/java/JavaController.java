@@ -43,8 +43,8 @@ public class JavaController extends CallbackController {
      * @return the url of the provider where to redirect the user
      * @throws TechnicalException
      */
-    protected static String redirectionUrl(final String clientName) throws TechnicalException {
-        return redirectionUrl(clientName, null);
+    protected static String getRedirectionUrl(final String clientName) throws TechnicalException {
+        return getRedirectionUrl(clientName, null);
     }
     
     /**
@@ -57,7 +57,8 @@ public class JavaController extends CallbackController {
      * @return the url of the provider where to redirect the user
      * @throws TechnicalException
      */
-    protected static String redirectionUrl(final String clientName, final String targetUrl) throws TechnicalException {
+    protected static String getRedirectionUrl(final String clientName, final String targetUrl)
+        throws TechnicalException {
         // get or create session id
         String sessionId = StorageHelper.getOrCreationSessionId(session());
         // requested url to save
@@ -76,7 +77,7 @@ public class JavaController extends CallbackController {
      * 
      * @return the user profile if the user is authenticated or <code>null</code> otherwise
      */
-    protected static CommonProfile profile() {
+    protected static CommonProfile getUserProfile() {
         // get the session id
         final String sessionId = session(Constants.SESSION_ID);
         logger.debug("sessionId for profile : {}", sessionId);

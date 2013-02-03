@@ -61,24 +61,14 @@ import play.api.Play.current
    * @return the current action to process or the redirection to the provider if the user is not authenticated
    */
   protected def RequiresAuthentication(clientName: String, targetUrl: String = "")(action: CommonProfile => Action[AnyContent]) = Action { request =>
-    val userProfile = profile(request)
-    if (userProfile == null) {
+    val profile = getUserProfile(request)
+    if (profile == null) {
       var newSession = getOrCreateSessionId(request)
-      val url = redirectUrl(request, newSession, clientName, targetUrl)
+      val url = getRedirectionUrl(request, newSession, clientName, targetUrl)
       Redirect(url).withSession(newSession)
     } else { 
-      action(userProfile)(request)
+      action(profile)(request)
     }
-  }
-
-  /**
-   * Retrieves the user profile if the user is authenticated or <code>null</code> otherwise.
-   * 
-   * @return the current action to process
-   */
-  protected def Profile(action: CommonProfile => Action[AnyContent]) = Action { request =>
-    val userProfile = profile(request)
-    action(userProfile)(request)
   }
 
   /**
@@ -90,7 +80,7 @@ import play.api.Play.current
    * @param targetUrl 
    * @return the redirection url to the provider
    */
-  protected def redirectUrl(request: RequestHeader, newSession: Session, clientName: String, targetUrl: String = ""): String = {
+  protected def getRedirectionUrl(request: RequestHeader, newSession: Session, clientName: String, targetUrl: String = ""): String = {
     val sessionId = newSession.get(Constants.SESSION_ID).get
     logger.debug("sessionId for redirectUrl : {}", sessionId)
     // save requested url to save
@@ -106,12 +96,12 @@ import play.api.Play.current
   }
 
   /**
-   * Returns the profile.
+   * Returns the user profile.
    *
    * @param request
-   * @return the profile
+   * @return the user profile
    */
-  private def profile(request: RequestHeader): CommonProfile = {
+  protected def getUserProfile(request: RequestHeader): CommonProfile = {
     // get the session id
     var profile: CommonProfile = null
     val sessionId = request.session.get(Constants.SESSION_ID)

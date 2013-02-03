@@ -45,9 +45,7 @@ public class CallbackController extends Controller {
     
     protected static final Logger logger = LoggerFactory.getLogger(CallbackController.class);
     
-    private static String errorPage401 = "authentication required";
-    
-    private static String errorPage403 = "forbidden";
+    protected final static String HTML_CONTENT_TYPE = "text/html; charset=utf-8";
     
     /**
      * This method handles the callback call from the provider to finish the authentication process. The credentials and then the profile of
@@ -78,11 +76,11 @@ public class CallbackController extends Controller {
             int code = context.getResponseStatus();
             logger.debug("HTTP action : {}", code);
             if (code == HttpConstants.UNAUTHORIZED) {
-                response().setContentType("text/html");
-                return unauthorized(errorPage401);
+                response().setContentType(HTML_CONTENT_TYPE);
+                return unauthorized(Config.getErrorPage401());
             } else if (code == HttpConstants.FORBIDDEN) {
-                response().setContentType("text/html");
-                return forbidden(errorPage403);
+                response().setContentType(HTML_CONTENT_TYPE);
+                return forbidden(Config.getErrorPage403());
             } else if (code == HttpConstants.TEMP_REDIRECT) {
                 return Results.status(HttpConstants.TEMP_REDIRECT);
             } else if (code == HttpConstants.OK) {
@@ -166,21 +164,5 @@ public class CallbackController extends Controller {
         }
         logger.debug("defaultUrl : {}", redirectUrl);
         return redirectUrl;
-    }
-    
-    public static String getErrorPage401() {
-        return errorPage401;
-    }
-    
-    public static void setErrorPage401(final String errorPage401) {
-        CallbackController.errorPage401 = errorPage401;
-    }
-    
-    public static String getErrorPage403() {
-        return errorPage403;
-    }
-    
-    public static void setErrorPage403(final String errorPage403) {
-        CallbackController.errorPage403 = errorPage403;
     }
 }

@@ -40,6 +40,10 @@ public final class Config {
     // all the clients
     private static Clients clients;
     
+    private static String errorPage401 = "authentication required";
+    
+    private static String errorPage403 = "forbidden";
+    
     public static String getDefaultSuccessUrl() {
         return defaultSuccessUrl;
     }
@@ -78,5 +82,21 @@ public final class Config {
     
     public static void setClients(final Clients clients) {
         Config.clients = clients;
+    }
+    
+    public static String getErrorPage401() {
+        return errorPage401;
+    }
+    
+    public static void setErrorPage401(final String errorPage401) {
+        Config.errorPage401 = errorPage401;
+    }
+    
+    public static String getErrorPage403() {
+        return errorPage403;
+    }
+    
+    public static void setErrorPage403(final String errorPage403) {
+        Config.errorPage403 = errorPage403;
     }
 }

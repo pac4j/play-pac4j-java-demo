@@ -35,14 +35,11 @@ import play.mvc.Http.Session;
  */
 public class JavaWebContext extends BaseResponseContext {
     
-    private Request request;
+    private final Request request;
     
-    private Response response;
+    private final Response response;
     
-    private Session session;
-    
-    protected JavaWebContext() {
-    }
+    private final Session session;
     
     public JavaWebContext(final Request request, final Response response, final Session session) {
         this.request = request;
@@ -104,5 +101,9 @@ public class JavaWebContext extends BaseResponseContext {
     @Override
     public void setResponseHeader(final String name, final String value) {
         this.response.setHeader(name, value);
+    }
+    
+    public Session getSession() {
+        return this.session;
     }
 }
