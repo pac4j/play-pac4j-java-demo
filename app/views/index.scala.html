@@ -1,10 +1,14 @@
-@(profile : org.pac4j.core.profile.CommonProfile, urlFacebook: String, urlTwitter: String, urlForm: String, urlBasicAuth: String, urlCas: String)
+@(profile : org.pac4j.core.profile.CommonProfile, urlFacebook: String, urlTwitter: String, urlForm: String, urlBasicAuth: String, urlCas: String, urlMyopenid: String)
 <h1>index</h1>
 <a href="facebook/index.html">facebook/index</a><br />
 <a href="twitter/index.html">twitter/index</a><br />
 <a href="form/index.html">form/index</a><br />
 <a href="basicauth/index.html">basicauth/index</a><br />
 <a href="cas/index.html">cas/index</a><br />
+<form action="myopenid/index.html" method="POST">
+  <input type="text" name="openIdUser" value="http://xxx.myopenid.com/" />
+  <input type="submit" value="myopenid/index" />
+</form>
 <br />
 <a href="logout">logout</a>
 <br /><br />
@@ -16,3 +20,7 @@ profile : @profile
 <a href="@urlForm">Authenticate via form</a><br />
 <a href="@urlBasicAuth">Authenticate via basic auth</a><br />
 <a href="@urlCas">Authenticate via CAS</a><br />
+<form action="@urlMyopenid" method="POST">
+  <input type="text" name="openIdUser" value="http://xxx.myopenid.com/" />
+  <input type="submit" value="Authenticate via myopenid.com" />
+</form>

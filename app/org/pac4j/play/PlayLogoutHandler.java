@@ -45,8 +45,7 @@ public final class PlayLogoutHandler extends NoLogoutHandler {
     }
     
     @Override
-    public void recordSession(final WebContext context) {
-        String ticket = context.getRequestParameter("ticket");
+    public void recordSession(final WebContext context, final String ticket) {
         logger.debug("ticket : {}", ticket);
         JavaWebContext javaWebContext = (JavaWebContext) context;
         String sessionId = javaWebContext.getSession().get(Constants.SESSION_ID);

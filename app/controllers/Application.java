@@ -14,12 +14,13 @@ public class Application extends JavaController {
     public static Result index() throws TechnicalException {
         // profile (maybe null if not authenticated)
         final CommonProfile profile = getUserProfile();
-        final String urlFacebook = getRedirectionUrl("FacebookClient");
-        final String urlTwitter = getRedirectionUrl("TwitterClient");
-        final String urlForm = getRedirectionUrl("FormClient");
-        final String urlBasicAuth = getRedirectionUrl("BasicAuthClient");
-        final String urlCas = getRedirectionUrl("CasClient");
-        return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas));
+        final String urlFacebook = getRedirectionUrl("FacebookClient", "/?0");
+        final String urlTwitter = getRedirectionUrl("TwitterClient", "/?1");
+        final String urlForm = getRedirectionUrl("FormClient", "/?2");
+        final String urlBasicAuth = getRedirectionUrl("BasicAuthClient", "/?3");
+        final String urlCas = getRedirectionUrl("CasClient", "/?4");
+        final String urlMyopenid = getRedirectionUrl("MyOpenIdClient", "/?5");
+        return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas, urlMyopenid));
     }
     
     private static Result protectedIndex() {
@@ -50,6 +51,11 @@ public class Application extends JavaController {
     
     @RequiresAuthentication(clientName = "CasClient")
     public static Result casIndex() {
+        return protectedIndex();
+    }
+    
+    @RequiresAuthentication(clientName = "MyOpenIdClient")
+    public static Result myopenidIndex() {
         return protectedIndex();
     }
     
