@@ -9,6 +9,7 @@ import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.openid.client.MyOpenIdClient;
 import org.pac4j.play.Config;
+import org.pac4j.play.PlayLogoutHandler;
 
 import play.Application;
 import play.GlobalSettings;
@@ -38,6 +39,7 @@ public class Global extends GlobalSettings {
         
         // CAS
         final CasClient casClient = new CasClient();
+        casClient.setLogoutHandler(new PlayLogoutHandler());
         casClient.setCasLoginUrl("http://localhost:8080/cas/login");
         
         // OpenID

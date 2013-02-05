@@ -73,7 +73,7 @@ public class CallbackController extends Controller {
         try {
             credentials = client.getCredentials(context);
         } catch (final RequiresHttpAction e) {
-            int code = context.getResponseStatus();
+            final int code = context.getResponseStatus();
             logger.debug("HTTP action : {}", code);
             if (code == HttpConstants.UNAUTHORIZED) {
                 response().setContentType(HTML_CONTENT_TYPE);
@@ -84,9 +84,9 @@ public class CallbackController extends Controller {
             } else if (code == HttpConstants.TEMP_REDIRECT) {
                 return Results.status(HttpConstants.TEMP_REDIRECT);
             } else if (code == HttpConstants.OK) {
-                return ok(context.getResponseContent());
+                return ok();
             }
-            String message = "Unsupported HTTP action : " + code;
+            final String message = "Unsupported HTTP action : " + code;
             logger.error(message);
             throw new TechnicalException(message);
         }
@@ -97,11 +97,11 @@ public class CallbackController extends Controller {
         logger.debug("profile : {}", profile);
         
         // get or create sessionId
-        String sessionId = StorageHelper.getOrCreationSessionId(session());
+        final String sessionId = StorageHelper.getOrCreationSessionId(session());
         // save user profile
         StorageHelper.saveProfile(sessionId, profile);
         // get requested url
-        String requestedUrl = StorageHelper.getRequestedUrl(sessionId, client.getName());
+        final String requestedUrl = StorageHelper.getRequestedUrl(sessionId, client.getName());
         
         // retrieve saved request and redirect
         return redirect(defaultUrl(requestedUrl, Config.getDefaultSuccessUrl()));
