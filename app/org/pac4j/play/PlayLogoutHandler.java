@@ -34,12 +34,12 @@ public final class PlayLogoutHandler extends NoLogoutHandler {
     
     @Override
     public void destroySession(final WebContext context) {
-        String logoutRequest = context.getRequestParameter("logoutRequest");
+        final String logoutRequest = context.getRequestParameter("logoutRequest");
         logger.debug("logoutRequest : {}", logoutRequest);
-        String ticket = StringUtils.substringBetween(logoutRequest, "SessionIndex>", "</");
-        logger.debug("ticket : {}", ticket);
-        String sessionId = (String) StorageHelper.get(ticket);
-        logger.debug("sessionId : {}", sessionId);
+        final String ticket = StringUtils.substringBetween(logoutRequest, "SessionIndex>", "</");
+        logger.debug("extract ticket : {}", ticket);
+        final String sessionId = (String) StorageHelper.get(ticket);
+        logger.debug("found sessionId : {}", sessionId);
         StorageHelper.removeProfile(sessionId);
         StorageHelper.remove(ticket);
     }
@@ -47,9 +47,9 @@ public final class PlayLogoutHandler extends NoLogoutHandler {
     @Override
     public void recordSession(final WebContext context, final String ticket) {
         logger.debug("ticket : {}", ticket);
-        JavaWebContext javaWebContext = (JavaWebContext) context;
-        String sessionId = javaWebContext.getSession().get(Constants.SESSION_ID);
-        logger.debug("sessionId : {}", sessionId);
+        final JavaWebContext javaWebContext = (JavaWebContext) context;
+        final String sessionId = javaWebContext.getSession().get(Constants.SESSION_ID);
+        logger.debug("save sessionId : {}", sessionId);
         StorageHelper.save(ticket, sessionId, Config.getProfileTimeout());
     }
 }

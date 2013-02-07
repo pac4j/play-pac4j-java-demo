@@ -32,4 +32,10 @@ public interface Constants {
     public final static String CLIENT_NAME = "clientName";
     
     public final static String TARGET_URL = "targetUrl";
+    
+    public final static String HTML_CONTENT_TYPE = "text/html; charset=utf-8";
+    
+    public final static String SEPARATOR = "$";
+    
+    public final static String START_AUTHENTICATION_SUFFIX = SEPARATOR + "startAuthentication";
 }

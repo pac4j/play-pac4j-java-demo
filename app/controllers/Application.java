@@ -51,6 +51,14 @@ public class Application extends JavaController {
     
     @RequiresAuthentication(clientName = "CasClient")
     public static Result casIndex() {
+        /*final CommonProfile profile = getUserProfile();
+        final String service = "http://localhost:8080/proxiedService";
+        String proxyTicket = null;
+        if (profile instanceof CasProxyProfile) {
+            final CasProxyProfile proxyProfile = (CasProxyProfile) profile;
+            proxyTicket = proxyProfile.getProxyTicketFor(service);
+        }
+        return ok(views.html.casProtectedIndex.render(profile, service, proxyTicket));*/
         return protectedIndex();
     }
     

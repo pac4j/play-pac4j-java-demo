@@ -32,8 +32,6 @@ public final class StorageHelper {
     
     private static final Logger logger = LoggerFactory.getLogger(StorageHelper.class);
     
-    private static final String SEPARATOR = "$";
-    
     /**
      * Get a session identifier and generates it if no session exists.
      * 
@@ -108,7 +106,7 @@ public final class StorageHelper {
      * @return the requested url
      */
     public static String getRequestedUrl(final String sessionId, final String clientName) {
-        return (String) get(sessionId, clientName + SEPARATOR + Constants.REQUESTED_URL);
+        return (String) get(sessionId, clientName + Constants.SEPARATOR + Constants.REQUESTED_URL);
     }
     
     /**
@@ -119,7 +117,7 @@ public final class StorageHelper {
      * @param requestedUrl
      */
     public static void saveRequestedUrl(final String sessionId, final String clientName, final String requestedUrl) {
-        save(sessionId, clientName + SEPARATOR + Constants.REQUESTED_URL, requestedUrl);
+        save(sessionId, clientName + Constants.SEPARATOR + Constants.REQUESTED_URL, requestedUrl);
     }
     
     /**
@@ -131,7 +129,7 @@ public final class StorageHelper {
      */
     public static Object get(final String sessionId, final String key) {
         if (sessionId != null) {
-            return get(sessionId + SEPARATOR + key);
+            return get(sessionId + Constants.SEPARATOR + key);
         }
         return null;
     }
@@ -145,8 +143,18 @@ public final class StorageHelper {
      */
     public static void save(final String sessionId, final String key, final Object value) {
         if (sessionId != null) {
-            save(sessionId + SEPARATOR + key, value, Config.getSessionTimeout());
+            save(sessionId + Constants.SEPARATOR + key, value, Config.getSessionTimeout());
         }
+    }
+    
+    /**
+     * Remove an object in storage.
+     * 
+     * @param sessionId
+     * @param key
+     */
+    public static void remove(final String sessionId, final String key) {
+        remove(sessionId + Constants.SEPARATOR + key);
     }
     
     /**

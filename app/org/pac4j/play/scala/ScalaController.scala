@@ -16,13 +16,16 @@
 package org.pac4j.play.scala
 
 import play.api._
-import play.api.mvc._
-import org.pac4j.core.profile._
-import org.slf4j._
 import play.api.cache.Cache
-import org.pac4j.play._
-import org.apache.commons.lang3.StringUtils
+import play.api.mvc._
 import play.api.Play.current
+import org.apache.commons.lang3.StringUtils
+import org.pac4j.core.client._
+import org.pac4j.core.credentials._
+import org.pac4j.core.profile._
+import org.pac4j.core.util._
+import org.pac4j.play._
+import org.slf4j._
 
 /**
  * This controller is the Scala controller to retrieve the user profile or the redirect url to start the authentication process.
@@ -61,11 +64,24 @@ import play.api.Play.current
    * @return the current action to process or the redirection to the provider if the user is not authenticated
    */
   protected def RequiresAuthentication(clientName: String, targetUrl: String = "")(action: CommonProfile => Action[AnyContent]) = Action { request =>
+    var newSession = getOrCreateSessionId(request)
+    val sessionId = newSession.get(Constants.SESSION_ID).get
+    logger.debug("sessionId : {}", sessionId)
     val profile = getUserProfile(request)
+    logger.debug("profile : {}", profile)
     if (profile == null) {
-      var newSession = getOrCreateSessionId(request)
-      val url = getRedirectionUrl(request, newSession, clientName, targetUrl)
-      Redirect(url).withSession(newSession)
+      val startAuth = StorageHelper.get(sessionId, clientName + Constants.START_AUTHENTICATION_SUFFIX).asInstanceOf[String]
+      logger.debug("startAuth : {}", startAuth);
+      StorageHelper.remove(sessionId, clientName + Constants.START_AUTHENTICATION_SUFFIX)
+      if (CommonHelper.isNotBlank(startAuth)) {
+        logger.error("not authenticated successfully to access a protected area -> forbidden")
+        Forbidden(Config.getErrorPage403()).as(HTML)
+      } else {
+        val redirectUrl = getRedirectionUrl(request, newSession, clientName, targetUrl, true)
+        logger.debug("redirectUrl : {}", redirectUrl)       
+        StorageHelper.save(sessionId, clientName + Constants.START_AUTHENTICATION_SUFFIX, "true")
+        Redirect(redirectUrl).withSession(newSession)
+      }
     } else { 
       action(profile)(request)
     }
@@ -78,9 +94,10 @@ import play.api.Play.current
    * @param newSession
    * @param clientName
    * @param targetUrl 
+   * @param forceDirectRedirection
    * @return the redirection url to the provider
    */
-  protected def getRedirectionUrl(request: RequestHeader, newSession: Session, clientName: String, targetUrl: String = ""): String = {
+  protected def getRedirectionUrl(request: RequestHeader, newSession: Session, clientName: String, targetUrl: String = "", forceDirectRedirection: Boolean = false): String = {
     val sessionId = newSession.get(Constants.SESSION_ID).get
     logger.debug("sessionId for redirectUrl : {}", sessionId)
     // save requested url to save
@@ -90,7 +107,7 @@ import play.api.Play.current
     // context
     val scalaWebContext = new ScalaWebContext(newSession)
     // redirect to the provider for authentication
-    val redirectUrl = Config.getClients().findClient(clientName).getRedirectionUrl(scalaWebContext)
+    val redirectUrl = Config.getClients().findClient(clientName).asInstanceOf[BaseClient[Credentials,CommonProfile]].getRedirectionUrl(scalaWebContext, forceDirectRedirection)
     logger.debug("redirectUrl to : {}", redirectUrl)
     redirectUrl
   }
@@ -113,5 +130,4 @@ import play.api.Play.current
     }
     profile
   }
-
 }

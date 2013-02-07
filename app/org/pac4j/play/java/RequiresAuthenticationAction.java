@@ -21,6 +21,7 @@ import java.lang.reflect.Proxy;
 
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.util.CommonHelper;
 import org.pac4j.play.CallbackController;
 import org.pac4j.play.Config;
 import org.pac4j.play.Constants;
@@ -66,12 +67,23 @@ public final class RequiresAuthenticationAction extends Action<Result> {
         final String targetUrl = (String) invocationHandler.invoke(this.configuration, targetUrlMethod, null);
         logger.debug("targetUrl : {}", targetUrl);
         // get or create session id
-        String sessionId = StorageHelper.getOrCreationSessionId(context.session());
+        final String sessionId = StorageHelper.getOrCreationSessionId(context.session());
         logger.debug("sessionId : {}", sessionId);
         final CommonProfile profile = StorageHelper.getProfile(sessionId);
         logger.debug("profile : {}", profile);
+        // has a profile -> access resource
         if (profile != null) {
             return this.delegate.call(context);
+        }
+        // no profile -> should try authentication if it has not already been tried
+        final String startAuth = (String) StorageHelper.get(sessionId, clientName
+                                                                       + Constants.START_AUTHENTICATION_SUFFIX);
+        logger.debug("startAuth : {}", startAuth);
+        StorageHelper.remove(sessionId, clientName + Constants.START_AUTHENTICATION_SUFFIX);
+        if (CommonHelper.isNotBlank(startAuth)) {
+            logger.error("not authenticated successfully to access a protected area -> forbidden");
+            context.response().setContentType(Constants.HTML_CONTENT_TYPE);
+            return forbidden(Config.getErrorPage403());
         }
         // requested url to save
         final String requestedUrlToSave = CallbackController.defaultUrl(targetUrl, context.request().uri());
@@ -84,6 +96,7 @@ public final class RequiresAuthenticationAction extends Action<Result> {
         final String redirectUrl = client.getRedirectionUrl(new JavaWebContext(context.request(), context.response(),
                                                                                context.session()), true);
         logger.debug("redirectUrl : {}", redirectUrl);
+        StorageHelper.save(sessionId, clientName + Constants.START_AUTHENTICATION_SUFFIX, "true");
         return redirect(redirectUrl);
     }
 }

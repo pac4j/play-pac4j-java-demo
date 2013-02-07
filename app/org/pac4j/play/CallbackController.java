@@ -45,8 +45,6 @@ public class CallbackController extends Controller {
     
     protected static final Logger logger = LoggerFactory.getLogger(CallbackController.class);
     
-    protected final static String HTML_CONTENT_TYPE = "text/html; charset=utf-8";
-    
     /**
      * This method handles the callback call from the provider to finish the authentication process. The credentials and then the profile of
      * the authenticated user is retrieved and the originally request url (or the specific saved url) is restored.
@@ -76,15 +74,17 @@ public class CallbackController extends Controller {
             final int code = context.getResponseStatus();
             logger.debug("HTTP action : {}", code);
             if (code == HttpConstants.UNAUTHORIZED) {
-                response().setContentType(HTML_CONTENT_TYPE);
+                response().setContentType(Constants.HTML_CONTENT_TYPE);
                 return unauthorized(Config.getErrorPage401());
-            } else if (code == HttpConstants.FORBIDDEN) {
-                response().setContentType(HTML_CONTENT_TYPE);
-                return forbidden(Config.getErrorPage403());
             } else if (code == HttpConstants.TEMP_REDIRECT) {
                 return Results.status(HttpConstants.TEMP_REDIRECT);
             } else if (code == HttpConstants.OK) {
-                return ok();
+                String content = context.getResponseContent();
+                logger.debug("render : {}", content);
+                if (content == null) {
+                    content = "";
+                }
+                return ok(content);
             }
             final String message = "Unsupported HTTP action : " + code;
             logger.error(message);
