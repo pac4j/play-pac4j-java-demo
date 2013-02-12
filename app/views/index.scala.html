@@ -1,13 +1,13 @@
 @(profile : org.pac4j.core.profile.CommonProfile, urlFacebook: String, urlTwitter: String, urlForm: String, urlBasicAuth: String, urlCas: String, urlMyopenid: String)
 <h1>index</h1>
-<a href="facebook/index.html">facebook/index</a><br />
-<a href="twitter/index.html">twitter/index</a><br />
-<a href="form/index.html">form/index</a><br />
-<a href="basicauth/index.html">basicauth/index</a><br />
-<a href="cas/index.html">cas/index</a><br />
+<a href="facebook/index.html">Protected url by Facebook : facebook/index.html</a><br />
+<a href="twitter/index.html">Protected url by Twitter : twitter/index.html</a><br />
+<a href="form/index.html">Protected url by form authentication : form/index.html</a><br />
+<a href="basicauth/index.html">Protected url by basic auth : basicauth/index.html</a><br />
+<a href="cas/index.html">Protected url by CAS : cas/index.html</a><br />
 <form action="myopenid/index.html" method="POST">
   <input type="text" name="openIdUser" value="http://xxx.myopenid.com/" />
-  <input type="submit" value="myopenid/index" />
+  <input type="submit" value="Protected url by myopenid.com : myopenid/index.html" />
 </form>
 <br />
 <a href="logout">logout</a>
@@ -15,12 +15,12 @@
 profile : @profile
 <br /><br />
 <hr />
-<a href="@urlFacebook">Authenticate at Facebook</a><br />
-<a href="@urlTwitter">Authenticate at Twitter</a><br />
-<a href="@urlForm">Authenticate via form</a><br />
-<a href="@urlBasicAuth">Authenticate via basic auth</a><br />
-<a href="@urlCas">Authenticate via CAS</a><br />
+<a href="@urlFacebook">Authenticate with Facebook</a><br />
+<a href="@urlTwitter">Authenticate with Twitter</a><br />
+<a href="@urlForm">Authenticate with form</a><br />
+<a href="@urlBasicAuth">Authenticate with basic auth</a><br />
+<a href="@urlCas">Authenticate with CAS</a><br />
 <form action="@urlMyopenid" method="POST">
   <input type="text" name="openIdUser" value="http://xxx.myopenid.com/" />
-  <input type="submit" value="Authenticate via myopenid.com" />
+  <input type="submit" value="Authenticate with myopenid.com" />
 </form>
