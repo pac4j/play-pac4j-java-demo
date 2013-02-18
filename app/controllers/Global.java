@@ -12,15 +12,14 @@ import org.pac4j.play.Config;
 
 import play.Application;
 import play.GlobalSettings;
-import play.mvc.Http.RequestHeader;
-import play.mvc.Result;
+//import play.mvc.Http.RequestHeader;
 
 public class Global extends GlobalSettings {
     
-    @Override
+    /*@Override
     public Result onError(final RequestHeader requestHeader, final Throwable t) {
         return play.mvc.Controller.internalServerError(views.html.error500.render());
-    }
+    }*/
     
     @Override
     public void onStart(final Application app) {
