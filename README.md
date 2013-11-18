@@ -5,6 +5,8 @@ The **play-pac4j** library is built to delegate authentication to a provider and
 
 **This demo works for the version 2.2 of the Play framework. In that case, the play-pac4j_java 1.2.0-SNAPSHOT version is required !**
 
+To work with the version 2.0 or 2.1 of the Play framework, please use the branch *play2.0or2.1* of this project...
+
 ## Quick start & test
 
 To start quickly :
