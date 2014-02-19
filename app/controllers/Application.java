@@ -22,8 +22,8 @@ public class Application extends JavaController {
         final String urlForm = getRedirectionUrl("FormClient", "/?2");
         final String urlBasicAuth = getRedirectionUrl("BasicAuthClient", "/?3");
         final String urlCas = getRedirectionUrl("CasClient", "/?4");
-        final String urlMyopenid = getRedirectionUrl("MyOpenIdClient", "/?5");
-        return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas, urlMyopenid));
+        final String urlGoogleOpenId = getRedirectionUrl("GoogleOpenIdClient", "/?5");
+        return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas, urlGoogleOpenId));
     }
     
     private static Result protectedIndex() {
@@ -75,8 +75,8 @@ public class Application extends JavaController {
         return protectedIndex();
     }
     
-    @RequiresAuthentication(clientName = "MyOpenIdClient")
-    public static Result myopenidIndex() {
+    @RequiresAuthentication(clientName = "GoogleOpenIdClient")
+    public static Result googleOpenIdIndex() {
         return protectedIndex();
     }
     

@@ -7,7 +7,7 @@ import org.pac4j.http.client.FormClient;
 import org.pac4j.http.credentials.SimpleTestUsernamePasswordAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
-import org.pac4j.openid.client.MyOpenIdClient;
+import org.pac4j.openid.client.GoogleOpenIdClient;
 import org.pac4j.play.Config;
 
 import play.Application;
@@ -46,10 +46,10 @@ public class Global extends GlobalSettings {
         casClient.setCasLoginUrl("http://localhost:8080/cas/login");
         
         // OpenID
-        final MyOpenIdClient myOpenIdClient = new MyOpenIdClient();
+        final GoogleOpenIdClient googleOpenIdClient = new GoogleOpenIdClient();
         
         final Clients clients = new Clients("http://localhost:9000/callback", facebookClient, twitterClient,
-                                            formClient, basicAuthClient, casClient, myOpenIdClient); // , casProxyReceptor);
+                                            formClient, basicAuthClient, casClient, googleOpenIdClient); // , casProxyReceptor);
         Config.setClients(clients);
         // for test purposes : profile timeout = 60 seconds
         // Config.setProfileTimeout(60);
