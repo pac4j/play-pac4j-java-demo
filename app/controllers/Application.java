@@ -22,8 +22,7 @@ public class Application extends JavaController {
         final String urlForm = getRedirectionUrl("FormClient", "/?2");
         final String urlBasicAuth = getRedirectionUrl("BasicAuthClient", "/?3");
         final String urlCas = getRedirectionUrl("CasClient", "/?4");
-        final String urlMyopenid = getRedirectionUrl("MyOpenIdClient", "/?5");
-        return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas, urlMyopenid));
+        return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas));
     }
     
     private static Result protectedIndex() {
@@ -72,11 +71,6 @@ public class Application extends JavaController {
             proxyTicket = proxyProfile.getProxyTicketFor(service);
         }
         return ok(views.html.casProtectedIndex.render(profile, service, proxyTicket));*/
-        return protectedIndex();
-    }
-    
-    @RequiresAuthentication(clientName = "MyOpenIdClient")
-    public static Result myopenidIndex() {
         return protectedIndex();
     }
     
