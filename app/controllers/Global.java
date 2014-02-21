@@ -12,6 +12,7 @@ import org.pac4j.play.Config;
 
 import play.Application;
 import play.GlobalSettings;
+import play.Play;
 //import play.mvc.Http.RequestHeader;
 
 public class Global extends GlobalSettings {
@@ -26,12 +27,17 @@ public class Global extends GlobalSettings {
         Config.setErrorPage401(views.html.error401.render().toString());
         Config.setErrorPage403(views.html.error403.render().toString());
         
+        final String fbId = Play.application().configuration().getString("fbId");
+        final String fbSecret = Play.application().configuration().getString("fbSecret");
+        final String baseUrl = Play.application().configuration().getString("baseUrl");
+        final String casUrl = Play.application().configuration().getString("casUrl");
+        
         // OAuth
-        final FacebookClient facebookClient = new FacebookClient("132736803558924", "e461422527aeedb32ee6c10834d3e19e");
+        final FacebookClient facebookClient = new FacebookClient(fbId, fbSecret);
         final TwitterClient twitterClient = new TwitterClient("HVSQGAw2XmiwcKOTvZFbQ",
                                                               "FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA");
         // HTTP
-        final FormClient formClient = new FormClient("http://localhost:9000/theForm",
+        final FormClient formClient = new FormClient(baseUrl + "/theForm",
                                                      new SimpleTestUsernamePasswordAuthenticator());
         final BasicAuthClient basicAuthClient = new BasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
         
@@ -43,12 +49,12 @@ public class Global extends GlobalSettings {
         /*final CasProxyReceptor casProxyReceptor = new CasProxyReceptor();
         casProxyReceptor.setCallbackUrl("http://localhost:9000/casProxyCallback");
         casClient.setCasProxyReceptor(casProxyReceptor);*/
-        casClient.setCasLoginUrl("http://localhost:8080/cas/login");
+        casClient.setCasLoginUrl(casUrl);
         
         // OpenID
         final GoogleOpenIdClient googleOpenIdClient = new GoogleOpenIdClient();
         
-        final Clients clients = new Clients("http://localhost:9000/callback", facebookClient, twitterClient,
+        final Clients clients = new Clients(baseUrl + "/callback", facebookClient, twitterClient,
                                             formClient, basicAuthClient, casClient, googleOpenIdClient); // , casProxyReceptor);
         Config.setClients(clients);
         // for test purposes : profile timeout = 60 seconds
