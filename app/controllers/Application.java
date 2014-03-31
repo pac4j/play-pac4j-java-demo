@@ -17,12 +17,12 @@ public class Application extends JavaController {
     public static Result index() throws TechnicalException {
         // profile (maybe null if not authenticated)
         final CommonProfile profile = getUserProfile();
-        final String urlFacebook = getRedirectionUrl("FacebookClient", "/?0");
-        final String urlTwitter = getRedirectionUrl("TwitterClient", "/?1");
-        final String urlForm = getRedirectionUrl("FormClient", "/?2");
-        final String urlBasicAuth = getRedirectionUrl("BasicAuthClient", "/?3");
-        final String urlCas = getRedirectionUrl("CasClient", "/?4");
-        final String urlGoogleOpenId = getRedirectionUrl("GoogleOpenIdClient", "/?5");
+        final String urlFacebook = getRedirectionAction("FacebookClient", "/?0").getLocation();
+        final String urlTwitter = getRedirectionAction("TwitterClient", "/?1").getLocation();
+        final String urlForm = getRedirectionAction("FormClient", "/?2").getLocation();
+        final String urlBasicAuth = getRedirectionAction("BasicAuthClient", "/?3").getLocation();
+        final String urlCas = getRedirectionAction("CasClient", "/?4").getLocation();
+        final String urlGoogleOpenId = getRedirectionAction("GoogleOpenIdClient", "/?5").getLocation();
         return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas, urlGoogleOpenId));
     }
     
