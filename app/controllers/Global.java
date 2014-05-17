@@ -55,10 +55,10 @@ public class Global extends GlobalSettings {
 
         // SAML
         final Saml2Client saml2Client = new Saml2Client();
-        saml2Client.setKeystorePath(Play.application().resource("samlKeystore.jks").getFile());
+        saml2Client.setKeystorePath("resource:samlKeystore.jks");
         saml2Client.setKeystorePassword("pac4j-demo-passwd");
         saml2Client.setPrivateKeyPassword("pac4j-demo-passwd");
-        saml2Client.setIdpMetadataPath(Play.application().resource("openidp-feide.xml").getFile());
+        saml2Client.setIdpMetadataPath("resource:openidp-feide.xml");
 
         // OpenID
         final GoogleOpenIdClient googleOpenIdClient = new GoogleOpenIdClient();
