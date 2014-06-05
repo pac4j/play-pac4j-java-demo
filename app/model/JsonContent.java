@@ -2,7 +2,7 @@ package model;
 
 import java.io.IOException;
 
-import play.mvc.Content;
+import play.twirl.api.Content;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;

@@ -9,7 +9,7 @@ import org.pac4j.play.Config;
 import org.pac4j.play.java.JavaController;
 import org.pac4j.play.java.RequiresAuthentication;
 
-import play.mvc.Content;
+import play.twirl.api.Content;
 import play.mvc.Result;
 
 public class Application extends JavaController {
