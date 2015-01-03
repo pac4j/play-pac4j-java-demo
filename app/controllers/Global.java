@@ -5,9 +5,10 @@ import org.pac4j.core.client.Clients;
 import org.pac4j.http.client.BasicAuthClient;
 import org.pac4j.http.client.FormClient;
 import org.pac4j.http.credentials.SimpleTestUsernamePasswordAuthenticator;
+import org.pac4j.http.profile.UsernameProfileCreator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
-import org.pac4j.openid.client.GoogleOpenIdClient;
+import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.play.Config;
 import org.pac4j.saml.client.Saml2Client;
 
@@ -40,8 +41,9 @@ public class Global extends GlobalSettings {
                 "FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA");
         // HTTP
         final FormClient formClient = new FormClient(baseUrl + "/theForm",
-                new SimpleTestUsernamePasswordAuthenticator());
-        final BasicAuthClient basicAuthClient = new BasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
+                new SimpleTestUsernamePasswordAuthenticator(), new UsernameProfileCreator());
+        final BasicAuthClient basicAuthClient = new BasicAuthClient(new SimpleTestUsernamePasswordAuthenticator(),
+                new UsernameProfileCreator());
 
         // CAS
         final CasClient casClient = new CasClient();
@@ -60,11 +62,15 @@ public class Global extends GlobalSettings {
         saml2Client.setPrivateKeyPassword("pac4j-demo-passwd");
         saml2Client.setIdpMetadataPath("resource:openidp-feide.xml");
 
-        // OpenID
-        final GoogleOpenIdClient googleOpenIdClient = new GoogleOpenIdClient();
+        // OpenID Connect
+        final OidcClient oidcClient = new OidcClient();
+        oidcClient.setClientID("343992089165-i1es0qvej18asl33mvlbeq750i3ko32k.apps.googleusercontent.com");
+        oidcClient.setSecret("unXK_RSCbCXLTic2JACTiAo9");
+        oidcClient.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
+        oidcClient.addCustomParam("prompt", "consent");
 
         final Clients clients = new Clients(baseUrl + "/callback", facebookClient, twitterClient, formClient,
-                basicAuthClient, casClient, saml2Client, googleOpenIdClient); // , casProxyReceptor);
+                basicAuthClient, casClient, saml2Client, oidcClient); // , casProxyReceptor);
         Config.setClients(clients);
         // for test purposes : profile timeout = 60 seconds
         // Config.setProfileTimeout(60);

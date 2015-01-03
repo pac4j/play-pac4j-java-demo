@@ -9,8 +9,8 @@ import org.pac4j.play.Config;
 import org.pac4j.play.java.JavaController;
 import org.pac4j.play.java.RequiresAuthentication;
 
-import play.twirl.api.Content;
 import play.mvc.Result;
+import play.twirl.api.Content;
 
 public class Application extends JavaController {
 
@@ -22,7 +22,7 @@ public class Application extends JavaController {
         final String urlForm = getRedirectAction("FormClient", "/?2").getLocation();
         final String urlBasicAuth = getRedirectAction("BasicAuthClient", "/?3").getLocation();
         final String urlCas = getRedirectAction("CasClient", "/?4").getLocation();
-        final String urlGoogleOpenId = getRedirectAction("GoogleOpenIdClient", "/?5").getLocation();
+        final String urlGoogleOpenId = getRedirectAction("OidcClient", "/?5").getLocation();
         final String urlSaml = getRedirectAction("Saml2Client", "/?6").getLocation();
         return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas,
                 urlGoogleOpenId, urlSaml));
@@ -82,7 +82,7 @@ public class Application extends JavaController {
         return protectedIndex();
     }
 
-    @RequiresAuthentication(clientName = "GoogleOpenIdClient")
+    @RequiresAuthentication(clientName = "OidcClient")
     public static Result googleOpenIdIndex() {
         return protectedIndex();
     }
@@ -90,5 +90,10 @@ public class Application extends JavaController {
     public static Result theForm() throws TechnicalException {
         final FormClient formClient = (FormClient) Config.getClients().findClient("FormClient");
         return ok(views.html.theForm.render(formClient.getCallbackUrl()));
+    }
+
+    @RequiresAuthentication(clientName = "BasicAuthClient", stateless = true)
+    public static Result statelessIndex() {
+        return protectedIndex();
     }
 }

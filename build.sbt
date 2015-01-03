@@ -7,12 +7,13 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 scalaVersion := "2.11.1"
 
 libraryDependencies ++= Seq(
-  "org.pac4j" % "play-pac4j_java" % "1.3.0",
-  "org.pac4j" % "pac4j-http" % "1.6.0",
-  "org.pac4j" % "pac4j-cas" % "1.6.0",
-  "org.pac4j" % "pac4j-openid" % "1.6.0",
-  "org.pac4j" % "pac4j-oauth" % "1.6.0",
-  "org.pac4j" % "pac4j-saml" % "1.6.0",
+  "org.pac4j" % "play-pac4j_java" % "1.4.0-SNAPSHOT",
+  "org.pac4j" % "pac4j-http" % "1.7.0-SNAPSHOT",
+  "org.pac4j" % "pac4j-cas" % "1.7.0-SNAPSHOT",
+  "org.pac4j" % "pac4j-openid" % "1.7.0-SNAPSHOT",
+  "org.pac4j" % "pac4j-oauth" % "1.7.0-SNAPSHOT",
+  "org.pac4j" % "pac4j-saml" % "1.7.0-SNAPSHOT",
+  "org.pac4j" % "pac4j-oidc" % "1.7.0-SNAPSHOT",
   "com.typesafe.play" % "play-cache_2.11" % "2.3.0"
 )
 
