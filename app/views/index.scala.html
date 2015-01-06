@@ -1,4 +1,4 @@
-@(profile : org.pac4j.core.profile.CommonProfile, urlFacebook: String, urlTwitter: String, urlForm: String, urlBasicAuth: String, urlCas: String, urlGoogleOpenId: String, urlSaml: String)
+@(profile : org.pac4j.core.profile.CommonProfile, urlFacebook: String, urlTwitter: String, urlForm: String, urlBasicAuth: String, urlCas: String, urlOidc: String, urlSaml: String)
 <h1>index</h1>
 <a href="facebook/index.html">Protected url by Facebook : facebook/index.html</a><br />
 <a href="twitter/index.html">Protected url by Twitter : twitter/index.html</a><br />
@@ -22,7 +22,7 @@ profile : @profile
 <a href="@urlBasicAuth">Authenticate with basic auth</a><br />
 <a href="@urlCas">Authenticate with CAS</a><br />
 <a href="@urlSaml">Authenticate with SAML</a><br />
-<a href="@urlGoogleOpenId">Authenticate with OpenID Connect</a><br />
+<a href="@urlOidc">Authenticate with OpenID Connect</a><br />
 <br />
 <br />
 <h1>Find the source code on <a target="_blank" href="https://github.com/leleuj/play-pac4j-java-demo">https://github.com/leleuj/play-pac4j-java-demo</a><br/>
