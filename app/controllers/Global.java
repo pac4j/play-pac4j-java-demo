@@ -44,8 +44,8 @@ public class Global extends GlobalSettings {
         /*final CasProxyReceptor casProxyReceptor = new CasProxyReceptor();
         casProxyReceptor.setCallbackUrl("http://localhost:9000/casProxyCallback");
         casClient.setCasProxyReceptor(casProxyReceptor);*/
-        casClient.setCasLoginUrl("https://freeuse1.casinthecloud.com/leleujgithub/login");
-        casClient.setCasPrefixUrl("https://freeuse1.casinthecloud.com/leleujgithub/p3");
+        casClient.setCasLoginUrl("http://localhost:8888/cas/login");
+        casClient.setCasPrefixUrl("http://localhost:8888/cas/p3");
 
         // SAML
         final Saml2Client saml2Client = new Saml2Client();
