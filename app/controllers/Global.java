@@ -5,6 +5,7 @@ import org.pac4j.core.client.Clients;
 import org.pac4j.http.client.BasicAuthClient;
 import org.pac4j.http.client.FormClient;
 import org.pac4j.http.credentials.SimpleTestUsernamePasswordAuthenticator;
+import org.pac4j.http.profile.UsernameProfileCreator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.play.Config;
@@ -33,8 +34,8 @@ public class Global extends GlobalSettings {
                 "FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA");
         // HTTP
         final FormClient formClient = new FormClient("http://localhost:9000/theForm",
-                new SimpleTestUsernamePasswordAuthenticator());
-        final BasicAuthClient basicAuthClient = new BasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
+                new SimpleTestUsernamePasswordAuthenticator(), new UsernameProfileCreator());
+        final BasicAuthClient basicAuthClient = new BasicAuthClient(new SimpleTestUsernamePasswordAuthenticator(), new UsernameProfileCreator());
 
         // CAS
         final CasClient casClient = new CasClient();
