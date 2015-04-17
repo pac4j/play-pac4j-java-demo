@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-cas" % "1.7.0",
   "org.pac4j" % "pac4j-openid" % "1.7.0",
   "org.pac4j" % "pac4j-oauth" % "1.7.0",
-  "org.pac4j" % "pac4j-saml" % "1.6.0"
+  "org.pac4j" % "pac4j-saml" % "1.7.0"
 )
 
 resolvers ++= Seq(
