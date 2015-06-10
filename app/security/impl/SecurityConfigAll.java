@@ -1,4 +1,4 @@
-package controllers;
+package security.impl;
 
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.core.client.Clients;
@@ -11,29 +11,28 @@ import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.play.Config;
 import org.pac4j.saml.client.Saml2Client;
+import play.Configuration;
+import security.SecurityConfig;
 
-import play.Application;
-import play.GlobalSettings;
-import play.Play;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-//import play.mvc.Http.RequestHeader;
+/**
+ * Implemmentation of {@link security.SecurityConfig} adding all posible
+ * clients to the configuration.
+ **/
+@Singleton
+public class SecurityConfigAll implements SecurityConfig {
 
-public class Global extends GlobalSettings {
-
-    /*@Override
-    public Result onError(final RequestHeader requestHeader, final Throwable t) {
-        return play.mvc.Controller.internalServerError(views.html.error500.render());
-    }*/
-
-    @Override
-    public void onStart(final Application app) {
+    @Inject
+    public SecurityConfigAll(Configuration configuration) {
         Config.setErrorPage401(views.html.error401.render().toString());
         Config.setErrorPage403(views.html.error403.render().toString());
 
-        final String fbId = Play.application().configuration().getString("fbId");
-        final String fbSecret = Play.application().configuration().getString("fbSecret");
-        final String baseUrl = Play.application().configuration().getString("baseUrl");
-        final String casUrl = Play.application().configuration().getString("casUrl");
+        final String fbId = configuration.getString("fbId");
+        final String fbSecret = configuration.getString("fbSecret");
+        final String baseUrl = configuration.getString("baseUrl");
+        final String casUrl = configuration.getString("casUrl");
 
         // OAuth
         final FacebookClient facebookClient = new FacebookClient(fbId, fbSecret);
