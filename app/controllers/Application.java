@@ -14,7 +14,7 @@ import play.twirl.api.Content;
 
 public class Application extends JavaController {
 
-    public static Result index() throws TechnicalException {
+    public Result index() throws TechnicalException {
         // profile (maybe null if not authenticated)
         final CommonProfile profile = getUserProfile();
         final String urlFacebook = getRedirectAction("FacebookClient", "/?0").getLocation();
@@ -28,31 +28,31 @@ public class Application extends JavaController {
                 urlSaml));
     }
 
-    private static Result protectedIndex() {
+    private Result protectedIndex() {
         // profile
         final CommonProfile profile = getUserProfile();
         return ok(views.html.protectedIndex.render(profile));
     }
 
     @RequiresAuthentication(clientName = "FacebookClient")
-    public static Result facebookIndex() {
+    public Result facebookIndex() {
         return protectedIndex();
     }
 
     @RequiresAuthentication(clientName = "TwitterClient")
-    public static Result twitterIndex() {
+    public Result twitterIndex() {
         return protectedIndex();
     }
 
     @RequiresAuthentication(clientName = "FormClient")
-    public static Result formIndex() {
+    public Result formIndex() {
         return protectedIndex();
     }
 
     // Setting the isAjax parameter to true will result in a 401 error response
     // instead of redirecting to the login url.
     @RequiresAuthentication(clientName = "FormClient", isAjax = true)
-    public static Result formIndexJson() {
+    public Result formIndexJson() {
         final CommonProfile profile = getUserProfile();
         Content content = views.html.protectedIndex.render(profile);
         JsonContent jsonContent = new JsonContent(content.body());
@@ -60,12 +60,12 @@ public class Application extends JavaController {
     }
 
     @RequiresAuthentication(clientName = "BasicAuthClient")
-    public static Result basicauthIndex() {
+    public Result basicauthIndex() {
         return protectedIndex();
     }
 
     @RequiresAuthentication(clientName = "CasClient")
-    public static Result casIndex() {
+    public Result casIndex() {
         /*final CommonProfile profile = getUserProfile();
         final String service = "http://localhost:8080/proxiedService";
         String proxyTicket = null;
@@ -78,22 +78,22 @@ public class Application extends JavaController {
     }
 
     @RequiresAuthentication(clientName = "Saml2Client")
-    public static Result samlIndex() {
+    public Result samlIndex() {
         return protectedIndex();
     }
 
     @RequiresAuthentication(clientName = "OidcClient")
-    public static Result oidcIndex() {
+    public Result oidcIndex() {
         return protectedIndex();
     }
 
-    public static Result theForm() throws TechnicalException {
+    public Result theForm() throws TechnicalException {
         final FormClient formClient = (FormClient) Config.getClients().findClient("FormClient");
         return ok(views.html.theForm.render(formClient.getCallbackUrl()));
     }
 
     @RequiresAuthentication(clientName = "BasicAuthClient", stateless = true)
-    public static Result statelessIndex() {
+    public Result statelessIndex() {
         return protectedIndex();
     }
 }
