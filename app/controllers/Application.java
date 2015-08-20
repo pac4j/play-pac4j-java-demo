@@ -2,28 +2,35 @@ package controllers;
 
 import model.JsonContent;
 
+import modules.SecurityModule;
+import org.pac4j.core.client.Clients;
+import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.http.client.FormClient;
-import org.pac4j.play.Config;
-import org.pac4j.play.java.JavaController;
+import org.pac4j.core.profile.UserProfile;
+import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.jwt.profile.JwtGenerator;
+import org.pac4j.play.PlayWebContext;
 import org.pac4j.play.java.RequiresAuthentication;
 
+import org.pac4j.play.java.UserProfileController;
 import play.mvc.Result;
 import play.twirl.api.Content;
 
-public class Application extends JavaController {
+public class Application extends UserProfileController<CommonProfile> {
 
-    public Result index() throws TechnicalException {
+    public Result index() throws Exception {
         // profile (maybe null if not authenticated)
         final CommonProfile profile = getUserProfile();
-        final String urlFacebook = getRedirectAction("FacebookClient", "/?0").getLocation();
-        final String urlTwitter = getRedirectAction("TwitterClient", "/?1").getLocation();
-        final String urlForm = getRedirectAction("FormClient", "/?2").getLocation();
-        final String urlBasicAuth = getRedirectAction("BasicAuthClient", "/?3").getLocation();
-        final String urlCas = getRedirectAction("CasClient", "/?4").getLocation();
-        final String urlOidc = getRedirectAction("OidcClient", "/?5").getLocation();
-        final String urlSaml = getRedirectAction("Saml2Client", "/?6").getLocation();
+        final Clients clients = config.getClients();
+        final PlayWebContext context = new PlayWebContext(ctx(), dataStore);
+        final String urlFacebook = ((IndirectClient) clients.findClient("FacebookClient")).getRedirectAction(context, false, false).getLocation();
+        final String urlTwitter = ((IndirectClient) clients.findClient("TwitterClient")).getRedirectAction(context, false, false).getLocation();
+        final String urlForm = ((IndirectClient) clients.findClient("FormClient")).getRedirectAction(context, false, false).getLocation();
+        final String urlBasicAuth = ((IndirectClient) clients.findClient("IndirectBasicAuthClient")).getRedirectAction(context, false, false).getLocation();
+        final String urlCas = ((IndirectClient) clients.findClient("CasClient")).getRedirectAction(context, false, false).getLocation();
+        final String urlOidc = ""; //((IndirectClient) clients.findClient("OidcClient")).getRedirectAction(context, false, false).getLocation();
+        final String urlSaml = ((IndirectClient) clients.findClient("SAML2Client")).getRedirectAction(context, false, false).getLocation();
         return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas, urlOidc,
                 urlSaml));
     }
@@ -36,6 +43,16 @@ public class Application extends JavaController {
 
     @RequiresAuthentication(clientName = "FacebookClient")
     public Result facebookIndex() {
+        return protectedIndex();
+    }
+
+    @RequiresAuthentication(clientName = "FacebookClient", requireAnyRole = "ROLE_ADMIN")
+    public Result facebookAdminIndex() {
+        return protectedIndex();
+    }
+
+    @RequiresAuthentication(clientName = "FacebookClient", authorizerName = "customAuthorizer")
+    public Result facebookCustomIndex() {
         return protectedIndex();
     }
 
@@ -59,7 +76,7 @@ public class Application extends JavaController {
         return ok(jsonContent);
     }
 
-    @RequiresAuthentication(clientName = "BasicAuthClient")
+    @RequiresAuthentication(clientName = "IndirectBasicAuthClient")
     public Result basicauthIndex() {
         return protectedIndex();
     }
@@ -77,7 +94,7 @@ public class Application extends JavaController {
         return protectedIndex();
     }
 
-    @RequiresAuthentication(clientName = "Saml2Client")
+    @RequiresAuthentication(clientName = "SAML2Client")
     public Result samlIndex() {
         return protectedIndex();
     }
@@ -87,13 +104,23 @@ public class Application extends JavaController {
         return protectedIndex();
     }
 
+    @RequiresAuthentication(clientName = "ParameterClient")
+    public Result restJwtIndex() {
+        return protectedIndex();
+    }
+
     public Result theForm() throws TechnicalException {
-        final FormClient formClient = (FormClient) Config.getClients().findClient("FormClient");
+        final FormClient formClient = (FormClient) config.getClients().findClient("FormClient");
         return ok(views.html.theForm.render(formClient.getCallbackUrl()));
     }
 
-    @RequiresAuthentication(clientName = "BasicAuthClient", stateless = true)
-    public Result statelessIndex() {
-        return protectedIndex();
+    public Result jwt() {
+        final UserProfile profile = getUserProfile();
+        final JwtGenerator generator = new JwtGenerator(SecurityModule.JWT_SALT);
+        String token = "";
+        if (profile != null) {
+            token = generator.generate(profile);
+        }
+        return ok(views.html.jwt.render(token));
     }
 }
