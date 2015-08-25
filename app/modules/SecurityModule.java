@@ -1,15 +1,117 @@
 package modules;
 
 import com.google.inject.AbstractModule;
-import security.SecurityConfig;
-import security.impl.SecurityConfigAll;
+import controllers.CustomAuthorizer;
+import controllers.DemoHttpActionHandler;
+import org.pac4j.cas.client.CasClient;
+import org.pac4j.core.client.Clients;
+import org.pac4j.core.config.Config;
+import org.pac4j.http.client.direct.ParameterClient;
+import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
+import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
+import org.pac4j.http.profile.creator.AuthenticatorProfileCreator;
+import org.pac4j.http.profile.creator.test.SimpleTestUsernameProfileCreator;
+import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
+import org.pac4j.oauth.client.FacebookClient;
+import org.pac4j.oauth.client.TwitterClient;
+import org.pac4j.oidc.client.OidcClient;
+import org.pac4j.play.ApplicationLogoutController;
+import org.pac4j.play.CallbackController;
+import org.pac4j.play.handler.HttpActionHandler;
+import org.pac4j.play.store.CacheStore;
+import org.pac4j.play.store.DataStore;
+import org.pac4j.saml.client.SAML2Client;
+import org.pac4j.saml.client.SAML2ClientConfiguration;
+import play.Configuration;
+import play.Environment;
 
-/**
- * Created by hv01016 on 10-6-2015.
- */
+import java.io.File;
+
 public class SecurityModule extends AbstractModule {
+
+    public final static String JWT_SALT = "12345678901234567890123456789012";
+
+    private final Environment environment;
+    private final Configuration configuration;
+
+    public SecurityModule(
+            Environment environment,
+            Configuration configuration) {
+        this.environment = environment;
+        this.configuration = configuration;
+    }
+
     @Override
     protected void configure() {
-        bind(SecurityConfig.class).to(SecurityConfigAll.class).asEagerSingleton();
+        final String fbId = configuration.getString("fbId");
+        final String fbSecret = configuration.getString("fbSecret");
+        final String baseUrl = configuration.getString("baseUrl");
+        final String casUrl = configuration.getString("casUrl");
+
+        // OAuth
+        final FacebookClient facebookClient = new FacebookClient(fbId, fbSecret);
+        final TwitterClient twitterClient = new TwitterClient("HVSQGAw2XmiwcKOTvZFbQ",
+                "FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA");
+        // HTTP
+        final FormClient formClient = new FormClient(baseUrl + "/theForm",
+                new SimpleTestUsernamePasswordAuthenticator(), new SimpleTestUsernameProfileCreator());
+        final IndirectBasicAuthClient basicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator(),
+                new SimpleTestUsernameProfileCreator());
+
+        // CAS
+        final CasClient casClient = new CasClient();
+        // casClient.setLogoutHandler(new PlayLogoutHandler());
+        // casClient.setCasProtocol(CasProtocol.SAML);
+        // casClient.setGateway(true);
+        /*final CasProxyReceptor casProxyReceptor = new CasProxyReceptor();
+        casProxyReceptor.setCallbackUrl("http://localhost:9000/casProxyCallback");
+        casClient.setCasProxyReceptor(casProxyReceptor);*/
+        casClient.setCasLoginUrl(casUrl);
+
+        // SAML
+        final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration("resource:samlKeystore.jks",
+                "pac4j-demo-passwd", "pac4j-demo-passwd", "resource:openidp-feide.xml");
+        cfg.setMaximumAuthenticationLifetime(3600);
+        cfg.setServiceProviderEntityId("urn:mace:saml:pac4j.org");
+        cfg.setServiceProviderMetadataPath(new File("target", "sp-metadata.xml").getAbsolutePath());
+        final SAML2Client saml2Client = new SAML2Client(cfg);
+
+        // OpenID Connect
+        final OidcClient oidcClient = new OidcClient();
+        oidcClient.setClientID("343992089165-i1es0qvej18asl33mvlbeq750i3ko32k.apps.googleusercontent.com");
+        oidcClient.setSecret("unXK_RSCbCXLTic2JACTiAo9");
+        oidcClient.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
+        oidcClient.addCustomParam("prompt", "consent");
+
+        // REST authent with JWT for a token passed in the url as the token parameter
+        ParameterClient parameterClient = new ParameterClient("token", new JwtAuthenticator(JWT_SALT), new AuthenticatorProfileCreator<>());
+        parameterClient.setSupportGetRequest(true);
+        parameterClient.setSupportPostRequest(false);
+
+        final Clients clients = new Clients(baseUrl + "/callback", facebookClient, twitterClient, formClient,
+                basicAuthClient, casClient, saml2Client, oidcClient, parameterClient); // , casProxyReceptor);
+
+        final Config config = new Config();
+        config.setClients(clients);
+        config.getAuthorizers().put("customAuthorizer", new CustomAuthorizer());
+        bind(Config.class).toInstance(config);
+
+        final CacheStore cacheStore = new CacheStore();
+        // for test purposes: profile timeout = 60 seconds
+        //cacheStore.setProfileTimeout(60);
+        bind(DataStore.class).toInstance(cacheStore);
+
+        // extra HTTP action handler
+        bind(HttpActionHandler.class).to(DemoHttpActionHandler.class);
+
+        // callback
+        final CallbackController callbackController = new CallbackController();
+        callbackController.setDefaultUrl("/");
+        bind(CallbackController.class).toInstance(callbackController);
+        // logout
+        final ApplicationLogoutController logoutController = new ApplicationLogoutController();
+        logoutController.setDefaultUrl("/");
+        bind(ApplicationLogoutController.class).toInstance(logoutController);
     }
 }
