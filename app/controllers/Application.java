@@ -66,8 +66,8 @@ public class Application extends UserProfileController<CommonProfile> {
         return protectedIndex();
     }
 
-    // Setting the isAjax parameter to true will result in a 401 error response
-    // instead of redirecting to the login url.
+    // Setting the isAjax parameter is no longer necessary as AJAX requests are automatically detected:
+    // a 401 error response will be returned instead of a redirection to the login url.
     @RequiresAuthentication(clientName = "FormClient")
     public Result formIndexJson() {
         final CommonProfile profile = getUserProfile();
