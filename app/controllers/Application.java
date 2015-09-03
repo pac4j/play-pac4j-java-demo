@@ -24,13 +24,13 @@ public class Application extends UserProfileController<CommonProfile> {
         final CommonProfile profile = getUserProfile();
         final Clients clients = config.getClients();
         final PlayWebContext context = new PlayWebContext(ctx(), dataStore);
-        final String urlFacebook = ((IndirectClient) clients.findClient("FacebookClient")).getRedirectAction(context, false, false).getLocation();
-        final String urlTwitter = ((IndirectClient) clients.findClient("TwitterClient")).getRedirectAction(context, false, false).getLocation();
-        final String urlForm = ((IndirectClient) clients.findClient("FormClient")).getRedirectAction(context, false, false).getLocation();
-        final String urlBasicAuth = ((IndirectClient) clients.findClient("IndirectBasicAuthClient")).getRedirectAction(context, false, false).getLocation();
-        final String urlCas = ((IndirectClient) clients.findClient("CasClient")).getRedirectAction(context, false, false).getLocation();
-        final String urlOidc = ""; //((IndirectClient) clients.findClient("OidcClient")).getRedirectAction(context, false, false).getLocation();
-        final String urlSaml = ((IndirectClient) clients.findClient("SAML2Client")).getRedirectAction(context, false, false).getLocation();
+        final String urlFacebook = ((IndirectClient) clients.findClient("FacebookClient")).getRedirectAction(context, false).getLocation();
+        final String urlTwitter = ((IndirectClient) clients.findClient("TwitterClient")).getRedirectAction(context, false).getLocation();
+        final String urlForm = ((IndirectClient) clients.findClient("FormClient")).getRedirectAction(context, false).getLocation();
+        final String urlBasicAuth = ((IndirectClient) clients.findClient("IndirectBasicAuthClient")).getRedirectAction(context, false).getLocation();
+        final String urlCas = ((IndirectClient) clients.findClient("CasClient")).getRedirectAction(context, false).getLocation();
+        final String urlOidc = ""; //((IndirectClient) clients.findClient("OidcClient")).getRedirectAction(context, false).getLocation();
+        final String urlSaml = ((IndirectClient) clients.findClient("SAML2Client")).getRedirectAction(context, false).getLocation();
         return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas, urlOidc,
                 urlSaml));
     }
@@ -66,9 +66,9 @@ public class Application extends UserProfileController<CommonProfile> {
         return protectedIndex();
     }
 
-    // Setting the isAjax parameter to true will result in a 401 error response
-    // instead of redirecting to the login url.
-    @RequiresAuthentication(clientName = "FormClient", isAjax = true)
+    // Setting the isAjax parameter is no longer necessary as AJAX requests are automatically detected:
+    // a 401 error response will be returned instead of a redirection to the login url.
+    @RequiresAuthentication(clientName = "FormClient")
     public Result formIndexJson() {
         final CommonProfile profile = getUserProfile();
         Content content = views.html.protectedIndex.render(profile);
