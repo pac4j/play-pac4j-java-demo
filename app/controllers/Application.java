@@ -29,13 +29,13 @@ public class Application extends UserProfileController<CommonProfile> {
         final String urlForm = ((IndirectClient) clients.findClient("FormClient")).getRedirectAction(context, false).getLocation();
         final String urlBasicAuth = ((IndirectClient) clients.findClient("IndirectBasicAuthClient")).getRedirectAction(context, false).getLocation();
         final String urlCas = ((IndirectClient) clients.findClient("CasClient")).getRedirectAction(context, false).getLocation();
-        final String urlOidc = ""; //((IndirectClient) clients.findClient("OidcClient")).getRedirectAction(context, false).getLocation();
+        final String urlOidc = ((IndirectClient) clients.findClient("OidcClient")).getRedirectAction(context, false).getLocation();
         final String urlSaml = ((IndirectClient) clients.findClient("SAML2Client")).getRedirectAction(context, false).getLocation();
         return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas, urlOidc,
                 urlSaml));
     }
 
-    private Result protectedIndex() {
+    private Result protectedIndexView() {
         // profile
         final CommonProfile profile = getUserProfile();
         return ok(views.html.protectedIndex.render(profile));
@@ -43,27 +43,32 @@ public class Application extends UserProfileController<CommonProfile> {
 
     @RequiresAuthentication(clientName = "FacebookClient")
     public Result facebookIndex() {
-        return protectedIndex();
+        return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "FacebookClient", requireAnyRole = "ROLE_ADMIN")
+    @RequiresAuthentication(clientName = "FacebookClient", authorizerName = "admin")
     public Result facebookAdminIndex() {
-        return protectedIndex();
+        return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "FacebookClient", authorizerName = "customAuthorizer")
+    @RequiresAuthentication(clientName = "FacebookClient", authorizerName = "custom")
     public Result facebookCustomIndex() {
-        return protectedIndex();
+        return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "TwitterClient")
+    @RequiresAuthentication(clientName = "TwitterClient,FacebookClient")
     public Result twitterIndex() {
-        return protectedIndex();
+        return protectedIndexView();
+    }
+
+    @RequiresAuthentication
+    public Result protectedIndex() {
+        return protectedIndexView();
     }
 
     @RequiresAuthentication(clientName = "FormClient")
     public Result formIndex() {
-        return protectedIndex();
+        return protectedIndexView();
     }
 
     // Setting the isAjax parameter is no longer necessary as AJAX requests are automatically detected:
@@ -78,7 +83,12 @@ public class Application extends UserProfileController<CommonProfile> {
 
     @RequiresAuthentication(clientName = "IndirectBasicAuthClient")
     public Result basicauthIndex() {
-        return protectedIndex();
+        return protectedIndexView();
+    }
+
+    @RequiresAuthentication(clientName = "DirectBasicAuthClient,ParameterClient")
+    public Result dbaIndex() {
+        return protectedIndexView();
     }
 
     @RequiresAuthentication(clientName = "CasClient")
@@ -91,22 +101,22 @@ public class Application extends UserProfileController<CommonProfile> {
             proxyTicket = proxyProfile.getProxyTicketFor(service);
         }
         return ok(views.html.casProtectedIndex.render(profile, service, proxyTicket));*/
-        return protectedIndex();
+        return protectedIndexView();
     }
 
     @RequiresAuthentication(clientName = "SAML2Client")
     public Result samlIndex() {
-        return protectedIndex();
+        return protectedIndexView();
     }
 
     @RequiresAuthentication(clientName = "OidcClient")
     public Result oidcIndex() {
-        return protectedIndex();
+        return protectedIndexView();
     }
 
     @RequiresAuthentication(clientName = "ParameterClient")
     public Result restJwtIndex() {
-        return protectedIndex();
+        return protectedIndexView();
     }
 
     public Result theForm() throws TechnicalException {

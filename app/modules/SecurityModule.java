@@ -2,23 +2,23 @@ package modules;
 
 import com.google.inject.AbstractModule;
 import controllers.CustomAuthorizer;
-import controllers.DemoHttpActionHandler;
+import controllers.DemoHttpActionAdapter;
 import org.pac4j.cas.client.CasClient;
+import org.pac4j.core.authorization.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
+import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
-import org.pac4j.http.profile.creator.AuthenticatorProfileCreator;
-import org.pac4j.http.profile.creator.test.SimpleTestUsernameProfileCreator;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.play.ApplicationLogoutController;
 import org.pac4j.play.CallbackController;
-import org.pac4j.play.handler.HttpActionHandler;
+import org.pac4j.play.http.HttpActionAdapter;
 import org.pac4j.play.store.CacheStore;
 import org.pac4j.play.store.DataStore;
 import org.pac4j.saml.client.SAML2Client;
@@ -54,10 +54,8 @@ public class SecurityModule extends AbstractModule {
         final TwitterClient twitterClient = new TwitterClient("HVSQGAw2XmiwcKOTvZFbQ",
                 "FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA");
         // HTTP
-        final FormClient formClient = new FormClient(baseUrl + "/theForm",
-                new SimpleTestUsernamePasswordAuthenticator(), new SimpleTestUsernameProfileCreator());
-        final IndirectBasicAuthClient basicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator(),
-                new SimpleTestUsernameProfileCreator());
+        final FormClient formClient = new FormClient(baseUrl + "/theForm", new SimpleTestUsernamePasswordAuthenticator());
+        final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         // CAS
         final CasClient casClient = new CasClient();
@@ -85,16 +83,19 @@ public class SecurityModule extends AbstractModule {
         oidcClient.addCustomParam("prompt", "consent");
 
         // REST authent with JWT for a token passed in the url as the token parameter
-        ParameterClient parameterClient = new ParameterClient("token", new JwtAuthenticator(JWT_SALT), new AuthenticatorProfileCreator<>());
+        ParameterClient parameterClient = new ParameterClient("token", new JwtAuthenticator(JWT_SALT));
         parameterClient.setSupportGetRequest(true);
         parameterClient.setSupportPostRequest(false);
 
-        final Clients clients = new Clients(baseUrl + "/callback", facebookClient, twitterClient, formClient,
-                basicAuthClient, casClient, saml2Client, oidcClient, parameterClient); // , casProxyReceptor);
+        // basic auth
+        final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
-        final Config config = new Config();
-        config.setClients(clients);
-        config.getAuthorizers().put("customAuthorizer", new CustomAuthorizer());
+        final Clients clients = new Clients(baseUrl + "/callback", facebookClient, twitterClient, formClient,
+                indirectBasicAuthClient, casClient, saml2Client, oidcClient, parameterClient, directBasicAuthClient); // , casProxyReceptor);
+
+        final Config config = new Config(clients);
+        config.addAuthorizer("admin", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
+        config.addAuthorizer("custom", new CustomAuthorizer());
         bind(Config.class).toInstance(config);
 
         final CacheStore cacheStore = new CacheStore();
@@ -103,7 +104,7 @@ public class SecurityModule extends AbstractModule {
         bind(DataStore.class).toInstance(cacheStore);
 
         // extra HTTP action handler
-        bind(HttpActionHandler.class).to(DemoHttpActionHandler.class);
+        bind(HttpActionAdapter.class).to(DemoHttpActionAdapter.class);
 
         // callback
         final CallbackController callbackController = new CallbackController();
