@@ -18,9 +18,10 @@ import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.play.ApplicationLogoutController;
 import org.pac4j.play.CallbackController;
+import org.pac4j.play.cas.logout.PlayCacheLogoutHandler;
 import org.pac4j.play.http.HttpActionAdapter;
-import org.pac4j.play.store.CacheStore;
 import org.pac4j.play.store.DataStore;
+import org.pac4j.play.store.PlayCacheStore;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
 import play.Configuration;
@@ -57,10 +58,15 @@ public class SecurityModule extends AbstractModule {
         final FormClient formClient = new FormClient(baseUrl + "/theForm", new SimpleTestUsernamePasswordAuthenticator());
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
+        final PlayCacheStore playCacheStore = new PlayCacheStore();
+        // for test purposes: profile timeout = 60 seconds
+        //cacheStore.setProfileTimeout(60);
+        bind(DataStore.class).toInstance(playCacheStore);
+
         // CAS
         final CasClient casClient = new CasClient();
-        // casClient.setLogoutHandler(new PlayLogoutHandler());
-        // casClient.setCasProtocol(CasProtocol.SAML);
+        casClient.setLogoutHandler(new PlayCacheLogoutHandler(playCacheStore));
+        casClient.setCasProtocol(CasClient.CasProtocol.CAS20);
         // casClient.setGateway(true);
         /*final CasProxyReceptor casProxyReceptor = new CasProxyReceptor();
         casProxyReceptor.setCallbackUrl("http://localhost:9000/casProxyCallback");
@@ -97,11 +103,6 @@ public class SecurityModule extends AbstractModule {
         config.addAuthorizer("admin", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
         config.addAuthorizer("custom", new CustomAuthorizer());
         bind(Config.class).toInstance(config);
-
-        final CacheStore cacheStore = new CacheStore();
-        // for test purposes: profile timeout = 60 seconds
-        //cacheStore.setProfileTimeout(60);
-        bind(DataStore.class).toInstance(cacheStore);
 
         // extra HTTP action handler
         bind(HttpActionAdapter.class).to(DemoHttpActionAdapter.class);
