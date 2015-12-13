@@ -23,7 +23,7 @@ public class Application extends UserProfileController<CommonProfile> {
         // profile (maybe null if not authenticated)
         final CommonProfile profile = getUserProfile();
         final Clients clients = config.getClients();
-        final PlayWebContext context = new PlayWebContext(ctx(), dataStore);
+        final PlayWebContext context = new PlayWebContext(ctx(), config.getSessionStore());
         final String urlFacebook = ((IndirectClient) clients.findClient("FacebookClient")).getRedirectAction(context, false).getLocation();
         final String urlTwitter = ((IndirectClient) clients.findClient("TwitterClient")).getRedirectAction(context, false).getLocation();
         final String urlForm = ((IndirectClient) clients.findClient("FormClient")).getRedirectAction(context, false).getLocation();
@@ -119,9 +119,9 @@ public class Application extends UserProfileController<CommonProfile> {
         return protectedIndexView();
     }
 
-    public Result theForm() throws TechnicalException {
+    public Result loginForm() throws TechnicalException {
         final FormClient formClient = (FormClient) config.getClients().findClient("FormClient");
-        return ok(views.html.theForm.render(formClient.getCallbackUrl()));
+        return ok(views.html.loginForm.render(formClient.getCallbackUrl()));
     }
 
     public Result jwt() {
