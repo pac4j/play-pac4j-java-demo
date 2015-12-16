@@ -20,8 +20,6 @@ import org.pac4j.play.ApplicationLogoutController;
 import org.pac4j.play.CallbackController;
 import org.pac4j.play.cas.logout.PlayCacheLogoutHandler;
 import org.pac4j.play.http.HttpActionAdapter;
-import org.pac4j.play.store.DataStore;
-import org.pac4j.play.store.PlayCacheStore;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
 import play.Configuration;
@@ -48,30 +46,23 @@ public class SecurityModule extends AbstractModule {
         final String fbId = configuration.getString("fbId");
         final String fbSecret = configuration.getString("fbSecret");
         final String baseUrl = configuration.getString("baseUrl");
-        final String casUrl = configuration.getString("casUrl");
 
         // OAuth
         final FacebookClient facebookClient = new FacebookClient(fbId, fbSecret);
         final TwitterClient twitterClient = new TwitterClient("HVSQGAw2XmiwcKOTvZFbQ",
                 "FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA");
         // HTTP
-        final FormClient formClient = new FormClient(baseUrl + "/theForm", new SimpleTestUsernamePasswordAuthenticator());
+        final FormClient formClient = new FormClient(baseUrl + "/loginForm", new SimpleTestUsernamePasswordAuthenticator());
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
-        final PlayCacheStore playCacheStore = new PlayCacheStore();
-        // for test purposes: profile timeout = 60 seconds
-        //cacheStore.setProfileTimeout(60);
-        bind(DataStore.class).toInstance(playCacheStore);
-
         // CAS
-        final CasClient casClient = new CasClient();
-        casClient.setLogoutHandler(new PlayCacheLogoutHandler(playCacheStore));
+        final CasClient casClient = new CasClient("https://casserverpac4j.herokuapp.com/login");
+        casClient.setLogoutHandler(new PlayCacheLogoutHandler());
         casClient.setCasProtocol(CasClient.CasProtocol.CAS20);
         // casClient.setGateway(true);
         /*final CasProxyReceptor casProxyReceptor = new CasProxyReceptor();
         casProxyReceptor.setCallbackUrl("http://localhost:9000/casProxyCallback");
         casClient.setCasProxyReceptor(casProxyReceptor);*/
-        casClient.setCasLoginUrl(casUrl);
 
         // SAML
         final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration("resource:samlKeystore.jks",
@@ -103,6 +94,9 @@ public class SecurityModule extends AbstractModule {
         config.addAuthorizer("admin", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
         config.addAuthorizer("custom", new CustomAuthorizer());
         bind(Config.class).toInstance(config);
+
+        // for test purposes: profile timeout = 60 seconds
+        //((PlayCacheStore) config.getSessionStore()).setProfileTimeout(60);
 
         // extra HTTP action handler
         bind(HttpActionAdapter.class).to(DemoHttpActionAdapter.class);
