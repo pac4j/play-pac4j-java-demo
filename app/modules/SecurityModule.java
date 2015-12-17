@@ -19,7 +19,6 @@ import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.play.ApplicationLogoutController;
 import org.pac4j.play.CallbackController;
 import org.pac4j.play.cas.logout.PlayCacheLogoutHandler;
-import org.pac4j.play.http.HttpActionAdapter;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
 import play.Configuration;
@@ -93,13 +92,11 @@ public class SecurityModule extends AbstractModule {
         final Config config = new Config(clients);
         config.addAuthorizer("admin", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
         config.addAuthorizer("custom", new CustomAuthorizer());
+        config.setHttpActionAdapter(new DemoHttpActionAdapter());
         bind(Config.class).toInstance(config);
 
         // for test purposes: profile timeout = 60 seconds
         //((PlayCacheStore) config.getSessionStore()).setProfileTimeout(60);
-
-        // extra HTTP action handler
-        bind(HttpActionAdapter.class).to(DemoHttpActionAdapter.class);
 
         // callback
         final CallbackController callbackController = new CallbackController();
