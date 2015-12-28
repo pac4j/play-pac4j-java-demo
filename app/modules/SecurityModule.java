@@ -56,8 +56,8 @@ public class SecurityModule extends AbstractModule {
 
         // CAS
         final CasClient casClient = new CasClient("https://casserverpac4j.herokuapp.com/login");
+        // final CasClient casClient = new CasClient("http://localhost:8080/cas2/login");
         casClient.setLogoutHandler(new PlayCacheLogoutHandler());
-        casClient.setCasProtocol(CasClient.CasProtocol.CAS20);
         // casClient.setGateway(true);
         /*final CasProxyReceptor casProxyReceptor = new CasProxyReceptor();
         casProxyReceptor.setCallbackUrl("http://localhost:9000/casProxyCallback");
