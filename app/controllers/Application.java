@@ -22,17 +22,7 @@ public class Application extends UserProfileController<CommonProfile> {
     public Result index() throws Exception {
         // profile (maybe null if not authenticated)
         final CommonProfile profile = getUserProfile();
-        final Clients clients = config.getClients();
-        final PlayWebContext context = new PlayWebContext(ctx(), config.getSessionStore());
-        final String urlFacebook = ((IndirectClient) clients.findClient("FacebookClient")).getRedirectAction(context, false).getLocation();
-        final String urlTwitter = ((IndirectClient) clients.findClient("TwitterClient")).getRedirectAction(context, false).getLocation();
-        final String urlForm = ((IndirectClient) clients.findClient("FormClient")).getRedirectAction(context, false).getLocation();
-        final String urlBasicAuth = ((IndirectClient) clients.findClient("IndirectBasicAuthClient")).getRedirectAction(context, false).getLocation();
-        final String urlCas = ((IndirectClient) clients.findClient("CasClient")).getRedirectAction(context, false).getLocation();
-        final String urlOidc = ((IndirectClient) clients.findClient("OidcClient")).getRedirectAction(context, false).getLocation();
-        final String urlSaml = ((IndirectClient) clients.findClient("SAML2Client")).getRedirectAction(context, false).getLocation();
-        return ok(views.html.index.render(profile, urlFacebook, urlTwitter, urlForm, urlBasicAuth, urlCas, urlOidc,
-                urlSaml));
+        return ok(views.html.index.render(profile));
     }
 
     private Result protectedIndexView() {
