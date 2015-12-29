@@ -13,6 +13,7 @@ import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
+import org.pac4j.oauth.client.CasOAuthWrapperClient;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.OidcClient;
@@ -55,9 +56,10 @@ public class SecurityModule extends AbstractModule {
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         // CAS
-        final CasClient casClient = new CasClient("https://casserverpac4j.herokuapp.com/login");
-        // final CasClient casClient = new CasClient("http://localhost:8080/cas2/login");
-        casClient.setLogoutHandler(new PlayCacheLogoutHandler());
+        final CasOAuthWrapperClient casClient = new CasOAuthWrapperClient("this_is_the_key2", "this_is_the_secret2", "http://localhost:8080/cas2/oauth2.0");
+        casClient.setName("CasClient");
+        /*final CasClient casClient = new CasClient("https://casserverpac4j.herokuapp.com/login");
+        casClient.setLogoutHandler(new PlayCacheLogoutHandler());*/
         // casClient.setGateway(true);
         /*final CasProxyReceptor casProxyReceptor = new CasProxyReceptor();
         casProxyReceptor.setCallbackUrl("http://localhost:9000/casProxyCallback");
