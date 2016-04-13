@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import play.twirl.api.Content;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,14 +25,7 @@ public class JsonContent implements Content {
         final ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(this.json);
-        } catch (final JsonGenerationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (final JsonMappingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (final IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return "";
@@ -44,5 +35,4 @@ public class JsonContent implements Content {
     public String contentType() {
         return this.contentType;
     }
-    
 }

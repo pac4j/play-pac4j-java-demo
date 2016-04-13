@@ -3,8 +3,7 @@ package modules;
 import com.google.inject.AbstractModule;
 import controllers.CustomAuthorizer;
 import controllers.DemoHttpActionAdapter;
-import org.pac4j.cas.client.CasClient;
-import org.pac4j.core.authorization.RequireAnyRoleAuthorizer;
+import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
@@ -19,7 +18,6 @@ import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.play.ApplicationLogoutController;
 import org.pac4j.play.CallbackController;
-import org.pac4j.play.cas.logout.PlayCacheLogoutHandler;
 import org.pac4j.play.store.PlayCacheStore;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
@@ -93,7 +91,7 @@ public class SecurityModule extends AbstractModule {
                 indirectBasicAuthClient, casClient, saml2Client, oidcClient, parameterClient, directBasicAuthClient); // , casProxyReceptor);
 
         final Config config = new Config(clients);
-        config.addAuthorizer("admin", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
+        config.addAuthorizer("admin", new RequireAnyRoleAuthorizer<>("ROLE_ADMIN"));
         config.addAuthorizer("custom", new CustomAuthorizer());
         config.setHttpActionAdapter(new DemoHttpActionAdapter());
         bind(Config.class).toInstance(config);
@@ -109,7 +107,7 @@ public class SecurityModule extends AbstractModule {
         bind(CallbackController.class).toInstance(callbackController);
         // logout
         final ApplicationLogoutController logoutController = new ApplicationLogoutController();
-        logoutController.setDefaultUrl("/");
+        logoutController.setDefaultUrl("/?defaulturlafterlogout");
         bind(ApplicationLogoutController.class).toInstance(logoutController);
     }
 }

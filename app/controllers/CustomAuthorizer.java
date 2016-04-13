@@ -1,22 +1,25 @@
 package controllers;
 
 import org.apache.commons.lang3.StringUtils;
-import org.pac4j.core.authorization.Authorizer;
+import org.pac4j.core.authorization.authorizer.ProfileAuthorizer;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.profile.UserProfile;
-import org.pac4j.http.profile.HttpProfile;
+import org.pac4j.core.exception.RequiresHttpAction;
+import org.pac4j.core.profile.CommonProfile;
 
-public class CustomAuthorizer implements Authorizer {
+import java.util.List;
 
-    public boolean isAuthorized(WebContext context, UserProfile profile) {
+public class CustomAuthorizer extends ProfileAuthorizer<CommonProfile> {
+
+    @Override
+    public boolean isAuthorized(final WebContext context, final List<CommonProfile> profiles) throws RequiresHttpAction {
+        return isAnyAuthorized(context, profiles);
+    }
+
+    @Override
+    public boolean isProfileAuthorized(final WebContext context, final CommonProfile profile) {
         if (profile == null) {
             return false;
         }
-        if (!(profile instanceof HttpProfile)) {
-            return false;
-        }
-        final HttpProfile httpProfile = (HttpProfile) profile;
-        final String username = httpProfile.getUsername();
-        return StringUtils.startsWith(username, "jle");
+        return StringUtils.startsWith(profile.getUsername(), "jle");
     }
 }
