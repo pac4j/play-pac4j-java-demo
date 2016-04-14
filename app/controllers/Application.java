@@ -29,7 +29,7 @@ public class Application extends Controller {
     private Config config;
 
     private List<CommonProfile> getProfiles() {
-        final PlayWebContext context = new PlayWebContext(ctx(), config.getSessionStore());
+        final PlayWebContext context = new PlayWebContext(ctx());
         final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
         return profileManager.getAll(true);
     }
@@ -137,7 +137,7 @@ public class Application extends Controller {
     }
 
     public Result forceLogin() {
-        final PlayWebContext context = new PlayWebContext(ctx(), config.getSessionStore());
+        final PlayWebContext context = new PlayWebContext(ctx());
         final Client client = config.getClients().findClient(context.getRequestParameter(Clients.DEFAULT_CLIENT_NAME_PARAMETER));
         try {
             client.redirect(context);
