@@ -1,89 +1,101 @@
 package controllers;
 
+import com.google.inject.Inject;
 import model.JsonContent;
 
 import modules.SecurityModule;
+import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
-import org.pac4j.core.client.IndirectClient;
+import org.pac4j.core.config.Config;
+import org.pac4j.core.exception.RequiresHttpAction;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.profile.UserProfile;
+import org.pac4j.core.profile.ProfileManager;
+import org.pac4j.core.util.CommonHelper;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.play.PlayWebContext;
-import org.pac4j.play.java.RequiresAuthentication;
 
-import org.pac4j.play.java.UserProfileController;
+import org.pac4j.play.java.Secure;
+import play.mvc.Controller;
 import play.mvc.Result;
 import play.twirl.api.Content;
 
-public class Application extends UserProfileController<CommonProfile> {
+import java.util.List;
+
+public class Application extends Controller {
+
+    @Inject
+    private Config config;
+
+    private List<CommonProfile> getProfiles() {
+        final PlayWebContext context = new PlayWebContext(ctx());
+        final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
+        return profileManager.getAll(true);
+    }
 
     public Result index() throws Exception {
-        // profile (maybe null if not authenticated)
-        final CommonProfile profile = getUserProfile();
-        return ok(views.html.index.render(profile));
+        // profiles (maybe be empty if not authenticated)
+        return ok(views.html.index.render(getProfiles()));
     }
 
     private Result protectedIndexView() {
-        // profile
-        final CommonProfile profile = getUserProfile();
-        return ok(views.html.protectedIndex.render(profile));
+        // profiles
+        return ok(views.html.protectedIndex.render(getProfiles()));
     }
 
-    @RequiresAuthentication(clientName = "FacebookClient")
+    @Secure(clients = "FacebookClient")
     public Result facebookIndex() {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "FacebookClient", authorizerName = "admin")
+    @Secure(clients = "FacebookClient", authorizers = "admin")
     public Result facebookAdminIndex() {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "FacebookClient", authorizerName = "custom")
+    @Secure(clients = "FacebookClient", authorizers = "custom")
     public Result facebookCustomIndex() {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "TwitterClient,FacebookClient")
+    @Secure(clients = "TwitterClient,FacebookClient")
     public Result twitterIndex() {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication
+    @Secure
     public Result protectedIndex() {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "FormClient")
+    @Secure(clients = "FormClient")
     public Result formIndex() {
         return protectedIndexView();
     }
 
     // Setting the isAjax parameter is no longer necessary as AJAX requests are automatically detected:
     // a 401 error response will be returned instead of a redirection to the login url.
-    @RequiresAuthentication(clientName = "FormClient")
+    @Secure(clients = "FormClient")
     public Result formIndexJson() {
-        final CommonProfile profile = getUserProfile();
-        Content content = views.html.protectedIndex.render(profile);
+        Content content = views.html.protectedIndex.render(getProfiles());
         JsonContent jsonContent = new JsonContent(content.body());
         return ok(jsonContent);
     }
 
-    @RequiresAuthentication(clientName = "IndirectBasicAuthClient")
+    @Secure(clients = "IndirectBasicAuthClient")
     public Result basicauthIndex() {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "DirectBasicAuthClient,ParameterClient")
+    @Secure(clients = "DirectBasicAuthClient,ParameterClient")
     public Result dbaIndex() {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "CasClient")
+    @Secure(clients = "CasClient")
     public Result casIndex() {
-        /*final CommonProfile profile = getUserProfile();
+        /*final CommonProfile profile = getProfiles().get(0);
         final String service = "http://localhost:8080/proxiedService";
         String proxyTicket = null;
         if (profile instanceof CasProxyProfile) {
@@ -94,17 +106,17 @@ public class Application extends UserProfileController<CommonProfile> {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "SAML2Client")
+    @Secure(clients = "SAML2Client")
     public Result samlIndex() {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "OidcClient")
+    @Secure(clients = "OidcClient")
     public Result oidcIndex() {
         return protectedIndexView();
     }
 
-    @RequiresAuthentication(clientName = "ParameterClient")
+    @Secure(clients = "ParameterClient")
     public Result restJwtIndex() {
         return protectedIndexView();
     }
@@ -115,12 +127,23 @@ public class Application extends UserProfileController<CommonProfile> {
     }
 
     public Result jwt() {
-        final UserProfile profile = getUserProfile();
+        final List<CommonProfile> profiles = getProfiles();
         final JwtGenerator generator = new JwtGenerator(SecurityModule.JWT_SALT);
         String token = "";
-        if (profile != null) {
-            token = generator.generate(profile);
+        if (CommonHelper.isNotEmpty(profiles)) {
+            token = generator.generate(profiles.get(0));
         }
         return ok(views.html.jwt.render(token));
+    }
+
+    public Result forceLogin() {
+        final PlayWebContext context = new PlayWebContext(ctx());
+        final Client client = config.getClients().findClient(context.getRequestParameter(Clients.DEFAULT_CLIENT_NAME_PARAMETER));
+        try {
+            client.redirect(context);
+            return (Result) config.getHttpActionAdapter().adapt(context.getResponseStatus(), context);
+        } catch (final RequiresHttpAction e) {
+            throw new TechnicalException(e);
+        }
     }
 }
