@@ -20,10 +20,10 @@ public class CustomErrorHandler extends DefaultHttpErrorHandler {
     }
 
     protected Promise<Result> onDevServerError(RequestHeader var1, UsefulException var2) {
-        return Promise.<Result>pure(Results.status(500, views.html.error500.render()));
+        return Promise.pure(Results.status(500, views.html.error500.render()));
     }
 
     protected Promise<Result> onProdServerError(RequestHeader var1, UsefulException var2) {
-        return Promise.<Result>pure(Results.status(500, views.html.error500.render()));
+        return Promise.pure(Results.status(500, views.html.error500.render()));
     }
 }
