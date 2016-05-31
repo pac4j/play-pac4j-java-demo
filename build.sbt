@@ -1,6 +1,6 @@
 name := "play-pac4j-java-demo"
 
-version := "2.2.0-SNAPSHOT"
+version := "2.2.0"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
