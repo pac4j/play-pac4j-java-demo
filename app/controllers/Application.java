@@ -7,7 +7,7 @@ import modules.SecurityModule;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.exception.RequiresHttpAction;
+import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
@@ -140,9 +140,9 @@ public class Application extends Controller {
         final PlayWebContext context = new PlayWebContext(ctx());
         final Client client = config.getClients().findClient(context.getRequestParameter(Clients.DEFAULT_CLIENT_NAME_PARAMETER));
         try {
-            client.redirect(context);
-            return (Result) config.getHttpActionAdapter().adapt(context.getResponseStatus(), context);
-        } catch (final RequiresHttpAction e) {
+            final HttpAction action = client.redirect(context);
+            return (Result) config.getHttpActionAdapter().adapt(action.getCode(), context);
+        } catch (final HttpAction e) {
             throw new TechnicalException(e);
         }
     }

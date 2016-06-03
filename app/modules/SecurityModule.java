@@ -104,6 +104,7 @@ public class SecurityModule extends AbstractModule {
         // callback
         final CallbackController callbackController = new CallbackController();
         callbackController.setDefaultUrl("/");
+        callbackController.setMultiProfile(true);
         bind(CallbackController.class).toInstance(callbackController);
         // logout
         final ApplicationLogoutController logoutController = new ApplicationLogoutController();
