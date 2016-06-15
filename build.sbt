@@ -4,7 +4,7 @@ version := "2.4.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   "org.pac4j" % "play-pac4j" % "2.4.0-SNAPSHOT",
@@ -20,7 +20,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-sql" % "1.9.0",
   "org.pac4j" % "pac4j-mongo" % "1.9.0",
   "org.pac4j" % "pac4j-stormpath" % "1.9.0",
-  "com.typesafe.play" % "play-cache_2.11" % "2.4.0",
+  "com.typesafe.play" % "play-cache_2.11" % "2.5.4",
   "commons-io" % "commons-io" % "2.4"
 )
 
