@@ -7,7 +7,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
-  "org.pac4j" % "play-pac4j" % "2.4.0-SNAPSHOT",
+  "org.pac4j" % "play-pac4j" % "2.4.0",
   "org.pac4j" % "pac4j-http" % "1.9.0",
   "org.pac4j" % "pac4j-cas" % "1.9.0",
   "org.pac4j" % "pac4j-openid" % "1.9.0" exclude("xml-apis" , "xml-apis"),
