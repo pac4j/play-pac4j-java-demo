@@ -31,8 +31,8 @@ public class Application extends Controller {
     private PlaySessionStore playSessionStore;
 
     private List<CommonProfile> getProfiles() {
-        PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
-        ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
+        final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
+        final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
         return profileManager.getAll(true);
     }
 
@@ -139,7 +139,7 @@ public class Application extends Controller {
     }
 
     public Result forceLogin() {
-        PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
+        final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
         final Client client = config.getClients().findClient(context.getRequestParameter(Clients.DEFAULT_CLIENT_NAME_PARAMETER));
         try {
             final HttpAction action = client.redirect(context);
