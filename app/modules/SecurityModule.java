@@ -3,6 +3,7 @@ package modules;
 import com.google.inject.AbstractModule;
 import controllers.CustomAuthorizer;
 import controllers.DemoHttpActionAdapter;
+import org.pac4j.cas.client.CasClient;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
@@ -12,17 +13,19 @@ import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
-import org.pac4j.oauth.client.CasOAuthWrapperClient;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.play.ApplicationLogoutController;
 import org.pac4j.play.CallbackController;
+import org.pac4j.play.cas.logout.PlayCacheLogoutHandler;
 import org.pac4j.play.store.PlayCacheStore;
+import org.pac4j.play.store.PlaySessionStore;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
 import play.Configuration;
 import play.Environment;
+import play.cache.CacheApi;
 
 import java.io.File;
 
@@ -33,15 +36,16 @@ public class SecurityModule extends AbstractModule {
     private final Environment environment;
     private final Configuration configuration;
 
-    public SecurityModule(
-            Environment environment,
-            Configuration configuration) {
+    public SecurityModule(Environment environment, Configuration configuration) {
         this.environment = environment;
         this.configuration = configuration;
     }
 
     @Override
     protected void configure() {
+
+        bind(PlaySessionStore.class).to(PlayCacheStore.class);
+
         final String fbId = configuration.getString("fbId");
         final String fbSecret = configuration.getString("fbSecret");
         final String baseUrl = configuration.getString("baseUrl");
@@ -55,10 +59,11 @@ public class SecurityModule extends AbstractModule {
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         // CAS
-        final CasOAuthWrapperClient casClient = new CasOAuthWrapperClient("this_is_the_key2", "this_is_the_secret2", "http://localhost:8080/cas2/oauth2.0");
-        casClient.setName("CasClient");
-        /*final CasClient casClient = new CasClient("https://casserverpac4j.herokuapp.com/login");
-        casClient.setLogoutHandler(new PlayCacheLogoutHandler());*/
+        // final CasOAuthWrapperClient casClient = new CasOAuthWrapperClient("this_is_the_key2", "this_is_the_secret2", "http://localhost:8080/cas2/oauth2.0");
+        // casClient.setName("CasClient");
+        final CasClient casClient = new CasClient("https://casserverpac4j.herokuapp.com/login");
+        casClient.setLogoutHandler(new PlayCacheLogoutHandler(getProvider(CacheApi.class)));
+
         // casClient.setGateway(true);
         /*final CasProxyReceptor casProxyReceptor = new CasProxyReceptor();
         casProxyReceptor.setCallbackUrl("http://localhost:9000/casProxyCallback");
@@ -95,11 +100,6 @@ public class SecurityModule extends AbstractModule {
         config.addAuthorizer("custom", new CustomAuthorizer());
         config.setHttpActionAdapter(new DemoHttpActionAdapter());
         bind(Config.class).toInstance(config);
-
-        // set profile timeout to 2h instead of the 1h default
-        PlayCacheStore store = new PlayCacheStore();
-        store.setProfileTimeout(7200);
-        config.setSessionStore(store);
 
         // callback
         final CallbackController callbackController = new CallbackController();

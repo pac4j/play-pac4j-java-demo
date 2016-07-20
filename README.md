@@ -9,7 +9,7 @@ This `play-pac4j-java-demo` project is a Java Play framework web app to test the
 Build the project and launch the Play app on [http://localhost:9000](http://localhost:9000):
 
     cd play-pac4j-java-demo
-    activator run
+    bin\activator run
 
 To test, you can call a protected url by clicking on the "Protected url by **xxx**" link, which will start the authentication process with the **xxx** provider.
 

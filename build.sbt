@@ -4,7 +4,7 @@ version := "2.5.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
   "org.pac4j" % "play-pac4j" % "2.5.0-SNAPSHOT",

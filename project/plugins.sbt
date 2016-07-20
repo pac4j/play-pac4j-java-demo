@@ -15,6 +15,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.1")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.0.0")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.0.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.1.0")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.2")

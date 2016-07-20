@@ -2,7 +2,6 @@ package controllers;
 
 import com.google.inject.Inject;
 import model.JsonContent;
-
 import modules.SecurityModule;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
@@ -15,8 +14,8 @@ import org.pac4j.core.util.CommonHelper;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.play.PlayWebContext;
-
 import org.pac4j.play.java.Secure;
+import org.pac4j.play.store.PlaySessionStore;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.twirl.api.Content;
@@ -28,8 +27,11 @@ public class Application extends Controller {
     @Inject
     private Config config;
 
+    @Inject
+    private PlaySessionStore playSessionStore;
+
     private List<CommonProfile> getProfiles() {
-        final PlayWebContext context = new PlayWebContext(ctx());
+        final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
         final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
         return profileManager.getAll(true);
     }
@@ -137,7 +139,7 @@ public class Application extends Controller {
     }
 
     public Result forceLogin() {
-        final PlayWebContext context = new PlayWebContext(ctx());
+        final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
         final Client client = config.getClients().findClient(context.getRequestParameter(Clients.DEFAULT_CLIENT_NAME_PARAMETER));
         try {
             final HttpAction action = client.redirect(context);
