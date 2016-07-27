@@ -83,6 +83,7 @@ public class SecurityModule extends AbstractModule {
         oidcClient.setSecret("unXK_RSCbCXLTic2JACTiAo9");
         oidcClient.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
         oidcClient.addCustomParam("prompt", "consent");
+        oidcClient.addAuthorizationGenerator(profile -> profile.addRole("ROLE_ADMIN"));
 
         // REST authent with JWT for a token passed in the url as the token parameter
         ParameterClient parameterClient = new ParameterClient("token", new JwtAuthenticator(JWT_SALT));
