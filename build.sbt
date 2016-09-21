@@ -7,7 +7,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
-  "org.pac4j" % "play-pac4j" % "2.5.0",
+  "org.pac4j" % "play-pac4j" % "2.6.0-SNAPSHOT",
   "org.pac4j" % "pac4j-http" % "1.9.2",
   "org.pac4j" % "pac4j-cas" % "1.9.2",
   "org.pac4j" % "pac4j-openid" % "1.9.2" exclude("xml-apis" , "xml-apis"),
@@ -21,7 +21,8 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-mongo" % "1.9.2",
   "org.pac4j" % "pac4j-stormpath" % "1.9.2",
   "com.typesafe.play" % "play-cache_2.11" % "2.5.4",
-  "commons-io" % "commons-io" % "2.4"
+  "commons-io" % "commons-io" % "2.4",
+  "be.objectify" %% "deadbolt-java" % "2.5.1"
 )
 
 resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/")

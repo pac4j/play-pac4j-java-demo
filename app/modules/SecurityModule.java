@@ -1,5 +1,6 @@
 package modules;
 
+import be.objectify.deadbolt.java.cache.HandlerCache;
 import com.google.inject.AbstractModule;
 import controllers.CustomAuthorizer;
 import controllers.DemoHttpActionAdapter;
@@ -21,6 +22,7 @@ import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.play.ApplicationLogoutController;
 import org.pac4j.play.CallbackController;
 import org.pac4j.play.cas.logout.PlayCacheLogoutHandler;
+import org.pac4j.play.deadbolt2.Pac4jHandlerCache;
 import org.pac4j.play.store.PlayCacheStore;
 import org.pac4j.play.store.PlaySessionStore;
 import org.pac4j.saml.client.SAML2Client;
@@ -43,6 +45,8 @@ public class SecurityModule extends AbstractModule {
 
     @Override
     protected void configure() {
+
+        bind(HandlerCache.class).to(Pac4jHandlerCache.class);
 
         bind(PlaySessionStore.class).to(PlayCacheStore.class);
 

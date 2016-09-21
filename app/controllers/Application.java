@@ -1,5 +1,6 @@
 package controllers;
 
+import be.objectify.deadbolt.java.actions.SubjectPresent;
 import com.google.inject.Inject;
 import model.JsonContent;
 import modules.SecurityModule;
@@ -46,7 +47,8 @@ public class Application extends Controller {
         return ok(views.html.protectedIndex.render(getProfiles()));
     }
 
-    @Secure(clients = "FacebookClient")
+    //@Secure(clients = "FacebookClient")
+    @SubjectPresent(handlerKey = "FacebookClient", forceBeforeAuthCheck = true)
     public Result facebookIndex() {
         return protectedIndexView();
     }
