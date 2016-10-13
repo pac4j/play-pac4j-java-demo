@@ -120,7 +120,7 @@ public class Application extends Controller {
         return protectedIndexView();
     }
 
-    @Secure(clients = "ParameterClient")
+    //@Secure(clients = "ParameterClient")
     public Result restJwtIndex() {
         return protectedIndexView();
     }
