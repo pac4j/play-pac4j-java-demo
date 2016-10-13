@@ -48,7 +48,6 @@ public class Application extends Controller {
     }
 
     //@Secure(clients = "FacebookClient")
-    @SubjectPresent(handlerKey = "FacebookClient", forceBeforeAuthCheck = true)
     public Result facebookIndex() {
         return protectedIndexView();
     }
@@ -73,7 +72,8 @@ public class Application extends Controller {
         return protectedIndexView();
     }
 
-    @Secure(clients = "FormClient")
+    //@Secure(clients = "FormClient")
+    @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
     public Result formIndex() {
         return protectedIndexView();
     }
