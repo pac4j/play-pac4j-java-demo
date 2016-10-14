@@ -115,7 +115,7 @@ public class Application extends Controller {
         return protectedIndexView();
     }
 
-    //@Secure(clients = "OidcClient")
+    @Secure(clients = "OidcClient")
     public Result oidcIndex() {
         return protectedIndexView();
     }
