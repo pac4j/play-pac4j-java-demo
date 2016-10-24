@@ -8,6 +8,7 @@ import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
+import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.direct.ParameterClient;
@@ -100,7 +101,8 @@ public class SecurityModule extends AbstractModule {
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         final Clients clients = new Clients(baseUrl + "/callback", facebookClient, twitterClient, formClient,
-                indirectBasicAuthClient, casClient, saml2Client, oidcClient, parameterClient, directBasicAuthClient); // , casProxyReceptor);
+                indirectBasicAuthClient, casClient, saml2Client, oidcClient, parameterClient, directBasicAuthClient,
+                new AnonymousClient()); // , casProxyReceptor);
 
         final Config config = new Config(clients);
         config.addAuthorizer("admin", new RequireAnyRoleAuthorizer<>("ROLE_ADMIN"));

@@ -7,6 +7,7 @@ import modules.SecurityModule;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
@@ -37,9 +38,12 @@ public class Application extends Controller {
         return profileManager.getAll(true);
     }
 
+    @Secure(clients = "AnonymousClient", authorizers = "csrfToken")
     public Result index() throws Exception {
+        final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
+        final String token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN);
         // profiles (maybe be empty if not authenticated)
-        return ok(views.html.index.render(getProfiles()));
+        return ok(views.html.index.render(getProfiles(), token));
     }
 
     private Result protectedIndexView() {
@@ -123,6 +127,11 @@ public class Application extends Controller {
     //@Secure(clients = "ParameterClient")
     public Result restJwtIndex() {
         return protectedIndexView();
+    }
+
+    //@Secure(clients = "AnonymousClient", authorizers = "csrfCheck")
+    public Result csrfIndex() {
+        return ok(views.html.csrf.render(getProfiles()));
     }
 
     public Result loginForm() throws TechnicalException {
