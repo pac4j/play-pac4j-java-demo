@@ -17,6 +17,7 @@
 <a href="jwt.html">Generate a JWT token</a><br />
 <a href="/dba/index.html">Protected url by DirectBasicAuthClient: /dba/index.html</a> (POST the <em>Authorization</em> header with value: <em>Basic amxlbGV1OmpsZWxldQ==</em>) then by <a href="/dba/index.html">ParameterClient: /dba/index.html</a> (with request parameter: token=<em>jwt_generated_token</em>)<br />
 <a href="/rest-jwt/index.html">Protected url by ParameterClient: /rest-jwt/index.html</a> (with request parameter: token=<em>jwt_generated_token</em>)<br />
+<a href="@routes.ProfileToContextController.displayPage1()">Sample for profile in the Http.Context ctx</a> For login got to: <a href="@routes.Application.loginForm()">@routes.Application.loginForm()</a><br />
 <br />
 <form method="POST" action="/csrf/index.html?pac4jCsrfToken=@token">
     Token: @token<br />
