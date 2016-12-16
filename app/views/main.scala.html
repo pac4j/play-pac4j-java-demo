@@ -1,0 +1,19 @@
+@(title: String)(content: Html)
+@import Http.Context
+@currentUserOptional = @{Context.current().args.get(org.pac4j.play.java.ProfileToContextAction.CONTEXT_CURRENT_PROFILE_KEY).asInstanceOf[java.util.Optional[org.pac4j.core.profile.CommonProfile]]}
+<html>
+  <head>
+    <title>@title</title>
+  </head>
+  <body>
+    <h1>@title</h1>
+    @if(currentUserOptional.isEmpty == false) {
+         Hello: @currentUserOptional.get().getUsername <br />
+         <a href="/logout?url=/?forcepostlogouturl">logout</a>
+    } else {
+      Please login !
+    }
+
+    @content
+  </body>
+</html>
