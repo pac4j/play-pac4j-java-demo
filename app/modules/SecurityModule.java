@@ -24,6 +24,7 @@ import org.pac4j.play.ApplicationLogoutController;
 import org.pac4j.play.CallbackController;
 import org.pac4j.play.cas.logout.PlayCacheLogoutHandler;
 import org.pac4j.play.deadbolt2.Pac4jHandlerCache;
+import org.pac4j.play.deadbolt2.Pac4jRoleHandler;
 import org.pac4j.play.store.PlayCacheStore;
 import org.pac4j.play.store.PlaySessionStore;
 import org.pac4j.saml.client.SAML2Client;
@@ -40,6 +41,8 @@ public class SecurityModule extends AbstractModule {
 
     private final Configuration configuration;
 
+    private static class MyPac4jRoleHandler implements Pac4jRoleHandler { }
+
     public SecurityModule(final Environment environment, final Configuration configuration) {
         this.configuration = configuration;
     }
@@ -49,6 +52,7 @@ public class SecurityModule extends AbstractModule {
 
         bind(HandlerCache.class).to(Pac4jHandlerCache.class);
 
+        bind(Pac4jRoleHandler.class).to(MyPac4jRoleHandler.class);
         bind(PlaySessionStore.class).to(PlayCacheStore.class);
 
         final String fbId = configuration.getString("fbId");
