@@ -1,4 +1,4 @@
-@(profileList: java.util.List[org.pac4j.core.profile.CommonProfile], token: String)
+@(profileList: java.util.List[org.pac4j.core.profile.CommonProfile], token: String, sessionId: String)
 @import scala.collection.JavaConverters._
 @profiles() = { @profileList.toList }
 <h1>index</h1>
@@ -22,11 +22,30 @@
     Token: @token<br />
     <input type="submit" value="Protected by CSRF token: /csrf/index.html" />
 </form>
+
 <a href="forceLogin?client_name=FacebookClient">Force Facebook login</a> (even if already authenticated)<br />
 <br />
-<a href="/logout?url=/?forcepostlogouturl">logout</a>
+<a href="/logout?url=/?forcepostlogouturl">local logout</a><br />
+<br />
+<a href="/centralLogout?url=http://localhost:8080/?forcepostlogouturlafteridp">central logout</a>
+<br /><br />
+    profiles: <%=manager.getAll(true)%><br />
+<br />
+    sessionId: <%=session.getId()%>
+
+
+
+
+
+<a href="forceLogin?client_name=FacebookClient">Force Facebook login</a> (even if already authenticated)<br />
+<br />
+<a href="/logout?url=/?forcepostlogouturl">local logout</a>
+<br/>
+<a href="/centralLogout?url=http://localhost:9000/?forcepostlogouturlafteridp">central logout</a>
 <br /><br />
 profiles: @profiles
+<br />
+sessionId: @sessionId
 <br /><br />
 <br />
 <br />

@@ -4,6 +4,7 @@ import be.objectify.deadbolt.java.actions.SubjectPresent;
 import com.google.inject.Inject;
 import model.JsonContent;
 import modules.SecurityModule;
+import org.pac4j.cas.profile.CasProxyProfile;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
@@ -14,7 +15,9 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
+import org.pac4j.play.LogoutController;
 import org.pac4j.play.PlayWebContext;
 import org.pac4j.play.java.Secure;
 import org.pac4j.play.store.PlaySessionStore;
@@ -23,6 +26,7 @@ import play.mvc.Result;
 import play.twirl.api.Content;
 
 import java.util.List;
+import java.util.concurrent.CompletionStage;
 
 public class Application extends Controller {
 
@@ -31,6 +35,16 @@ public class Application extends Controller {
 
     @Inject
     private PlaySessionStore playSessionStore;
+
+    private LogoutController centralLogoutController;
+
+    public Application() {
+        centralLogoutController = new LogoutController();
+        centralLogoutController.setDefaultUrl("http://localhost:9000/?defaulturlafterlogoutafteridp");
+        centralLogoutController.setLocalLogout(false);
+        centralLogoutController.setCentralLogout(true);
+        centralLogoutController.setLogoutUrlPattern("http://localhost:9000/.*");
+    }
 
     private List<CommonProfile> getProfiles() {
         final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
@@ -41,9 +55,10 @@ public class Application extends Controller {
     @Secure(clients = "AnonymousClient", authorizers = "csrfToken")
     public Result index() throws Exception {
         final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
+        final String sessionId = context.getSessionIdentifier();
         final String token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN);
         // profiles (maybe be empty if not authenticated)
-        return ok(views.html.index.render(getProfiles(), token));
+        return ok(views.html.index.render(getProfiles(), token, sessionId));
     }
 
     private Result protectedIndexView() {
@@ -103,15 +118,14 @@ public class Application extends Controller {
 
     @Secure(clients = "CasClient")
     public Result casIndex() {
-        /*final CommonProfile profile = getProfiles().get(0);
+        final CommonProfile profile = getProfiles().get(0);
         final String service = "http://localhost:8080/proxiedService";
         String proxyTicket = null;
         if (profile instanceof CasProxyProfile) {
             final CasProxyProfile proxyProfile = (CasProxyProfile) profile;
             proxyTicket = proxyProfile.getProxyTicketFor(service);
         }
-        return ok(views.html.casProtectedIndex.render(profile, service, proxyTicket));*/
-        return protectedIndexView();
+        return ok(views.html.casProtectedIndex.render(profile, service, proxyTicket));
     }
 
     @Secure(clients = "SAML2Client")
@@ -141,7 +155,7 @@ public class Application extends Controller {
 
     public Result jwt() {
         final List<CommonProfile> profiles = getProfiles();
-        final JwtGenerator generator = new JwtGenerator(SecurityModule.JWT_SALT);
+        final JwtGenerator generator = new JwtGenerator(new SecretSignatureConfiguration(SecurityModule.JWT_SALT));
         String token = "";
         if (CommonHelper.isNotEmpty(profiles)) {
             token = generator.generate(profiles.get(0));
@@ -158,5 +172,9 @@ public class Application extends Controller {
         } catch (final HttpAction e) {
             throw new TechnicalException(e);
         }
+    }
+
+    public CompletionStage<Result> centralLogout() {
+        return centralLogoutController.logout();
     }
 }
