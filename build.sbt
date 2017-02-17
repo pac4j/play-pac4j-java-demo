@@ -2,11 +2,15 @@ name := "play-pac4j-java-demo"
 
 version := "2.6.2-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayJava)
+lazy val root = (project in file(".")).enablePlugins(PlayJava,PlayEbean,DebianPlugin)
 
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
+  javaJdbc,
+  javaJpa,
+  javaWs,
+  evolutions,
   "org.pac4j" % "play-pac4j" % "2.6.2",
   "org.pac4j" % "pac4j-http" % "1.9.5",
   "org.pac4j" % "pac4j-cas" % "1.9.5",
