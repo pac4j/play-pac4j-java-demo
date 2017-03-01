@@ -64,8 +64,7 @@ public class SecurityModule extends AbstractModule {
 
         // OAuth
         final FacebookClient facebookClient = new FacebookClient(fbId, fbSecret);
-        final TwitterClient twitterClient = new TwitterClient("HVSQGAw2XmiwcKOTvZFbQ",
-                "FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA");
+        final TwitterClient twitterClient = new TwitterClient("HVSQGAw2XmiwcKOTvZFbQ", "FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA");
         // HTTP
         final FormClient formClient = new FormClient(baseUrl + "/loginForm", new SimpleTestUsernamePasswordAuthenticator());
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
@@ -94,7 +93,7 @@ public class SecurityModule extends AbstractModule {
         oidcConfiguration.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
         oidcConfiguration.addCustomParam("prompt", "consent");
         final OidcClient oidcClient = new OidcClient(oidcConfiguration);
-        oidcClient.addAuthorizationGenerator(profile -> profile.addRole("ROLE_ADMIN"));
+        oidcClient.addAuthorizationGenerator((ctx, profile) -> { profile.addRole("ROLE_ADMIN"); return profile; });
 
         // REST authent with JWT for a token passed in the url as the token parameter
         final ParameterClient parameterClient = new ParameterClient("token",

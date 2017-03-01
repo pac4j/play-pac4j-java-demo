@@ -17,7 +17,6 @@ import org.pac4j.core.util.CommonHelper;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
-import org.pac4j.play.LogoutController;
 import org.pac4j.play.PlayWebContext;
 import org.pac4j.play.java.Secure;
 import org.pac4j.play.store.PlaySessionStore;
@@ -26,7 +25,6 @@ import play.mvc.Result;
 import play.twirl.api.Content;
 
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 
 public class Application extends Controller {
 
@@ -35,16 +33,6 @@ public class Application extends Controller {
 
     @Inject
     private PlaySessionStore playSessionStore;
-
-    private LogoutController centralLogoutController;
-
-    public Application() {
-        centralLogoutController = new LogoutController();
-        centralLogoutController.setDefaultUrl("http://localhost:9000/?defaulturlafterlogoutafteridp");
-        centralLogoutController.setLocalLogout(false);
-        centralLogoutController.setCentralLogout(true);
-        centralLogoutController.setLogoutUrlPattern("http://localhost:9000/.*");
-    }
 
     private List<CommonProfile> getProfiles() {
         final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
@@ -172,9 +160,5 @@ public class Application extends Controller {
         } catch (final HttpAction e) {
             throw new TechnicalException(e);
         }
-    }
-
-    public CompletionStage<Result> centralLogout() {
-        return centralLogoutController.logout();
     }
 }
