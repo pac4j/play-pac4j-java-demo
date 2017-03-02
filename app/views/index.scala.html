@@ -1,4 +1,4 @@
-@(profileList: java.util.List[org.pac4j.core.profile.CommonProfile], token: String)
+@(profileList: java.util.List[org.pac4j.core.profile.CommonProfile], token: String, sessionId: String)
 @import scala.collection.JavaConverters._
 @profiles() = { @profileList.toList }
 <h1>index</h1>
@@ -24,9 +24,13 @@
 </form>
 <a href="forceLogin?client_name=FacebookClient">Force Facebook login</a> (even if already authenticated)<br />
 <br />
-<a href="/logout?url=/?forcepostlogouturl">logout</a>
+<a href="/logout?url=/?forcepostlogouturl">local logout</a><br />
+<br/>
+<a href="/centralLogout?url=http://localhost:9000/?forcepostlogouturlafteridp">central logout</a>
 <br /><br />
-profiles: @profiles
+profiles: @profiles<br />
+<br />
+sessionId: @sessionId
 <br /><br />
 <br />
 <br />
