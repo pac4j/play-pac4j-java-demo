@@ -32,7 +32,7 @@ import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
 import play.Configuration;
 import play.Environment;
-import play.cache.CacheApi;
+import play.cache.SyncCacheApi;
 
 import java.io.File;
 
@@ -54,7 +54,7 @@ public class SecurityModule extends AbstractModule {
         bind(HandlerCache.class).to(Pac4jHandlerCache.class);
 
         bind(Pac4jRoleHandler.class).to(MyPac4jRoleHandler.class);
-        final PlayCacheSessionStore playCacheSessionStore = new PlayCacheSessionStore(getProvider(CacheApi.class));
+        final PlayCacheSessionStore playCacheSessionStore = new PlayCacheSessionStore(getProvider(SyncCacheApi.class));
         bind(PlaySessionStore.class).toInstance(playCacheSessionStore);
         //bind(PlaySessionStore.class).to(PlayCacheSessionStore.class);
 
@@ -72,10 +72,10 @@ public class SecurityModule extends AbstractModule {
         // CAS
         // final CasOAuthWrapperClient casClient = new CasOAuthWrapperClient("this_is_the_key2", "this_is_the_secret2", "http://localhost:8080/cas2/oauth2.0");
         // casClient.setName("CasClient");
-        //final CasConfiguration casConfiguration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
-        final CasConfiguration casConfiguration = new CasConfiguration("http://localhost:8888/cas/login");
+        final CasConfiguration casConfiguration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
+        //final CasConfiguration casConfiguration = new CasConfiguration("http://localhost:8888/cas/login");
         final CasProxyReceptor casProxyReceptor = new CasProxyReceptor();
-        casConfiguration.setProxyReceptor(casProxyReceptor);
+        //casConfiguration.setProxyReceptor(casProxyReceptor);
         final CasClient casClient = new CasClient(casConfiguration);
 
         // SAML

@@ -5,6 +5,8 @@ import play.http.HttpFilters;
 import play.mvc.EssentialFilter;
 
 import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.List;
 
 public class Filters implements HttpFilters {
 
@@ -16,7 +18,7 @@ public class Filters implements HttpFilters {
     }
 
     @Override
-    public EssentialFilter[] filters() {
-        return new EssentialFilter[] { securityFilter.asJava() };
+    public List<EssentialFilter> getFilters() {
+        return Arrays.asList(securityFilter.asJava());
     }
 }
