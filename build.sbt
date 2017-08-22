@@ -1,13 +1,13 @@
 name := "play-pac4j-java-demo"
 
-version := "3.0.0-SNAPSHOT"
+version := "3.0.1-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
-  "org.pac4j" % "play-pac4j" % "3.0.0",
+  "org.pac4j" % "play-pac4j" % "3.0.1-SNAPSHOT",
   "org.pac4j" % "pac4j-http" % "2.0.0",
   "org.pac4j" % "pac4j-cas" % "2.0.0",
   "org.pac4j" % "pac4j-openid" % "2.0.0" exclude("xml-apis" , "xml-apis"),
