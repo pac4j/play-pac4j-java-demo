@@ -99,7 +99,7 @@ public class Application extends Controller {
         return protectedIndexView();
     }
 
-    @Secure(clients = "DirectBasicAuthClient,ParameterClient")
+    @Secure(clients = "DirectBasicAuthClient,ParameterClient,DirectFormClient")
     public Result dbaIndex() {
         return protectedIndexView();
     }

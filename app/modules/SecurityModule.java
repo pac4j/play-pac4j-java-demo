@@ -11,7 +11,11 @@ import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.credentials.UsernamePasswordCredentials;
+import org.pac4j.core.credentials.authenticator.Authenticator;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
+import org.pac4j.http.client.direct.DirectFormClient;
 import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
@@ -101,11 +105,25 @@ public class SecurityModule extends AbstractModule {
         parameterClient.setSupportGetRequest(true);
         parameterClient.setSupportPostRequest(false);
 
+        // Fake blocking authentication
+        final Authenticator<UsernamePasswordCredentials> blockingAuthenticator = (credentials, ctx) -> {
+
+            final int wait = 50 + random(200);
+            wait(wait);
+
+            if (random(10) <= 7) {
+                CommonProfile profile = new CommonProfile();
+                profile.setId("fake" + wait);
+                credentials.setUserProfile(profile);
+            }
+        };
+        final DirectFormClient directFormClient = new DirectFormClient(blockingAuthenticator);
+
         // basic auth
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         final Clients clients = new Clients(baseUrl + "/callback", facebookClient, twitterClient, formClient,
-                indirectBasicAuthClient, casClient, saml2Client, oidcClient, parameterClient, directBasicAuthClient,
+                indirectBasicAuthClient, casClient, saml2Client, oidcClient, parameterClient, directFormClient, directBasicAuthClient,
                 new AnonymousClient(), casProxyReceptor);
 
         final Config config = new Config(clients);
@@ -125,5 +143,15 @@ public class SecurityModule extends AbstractModule {
         logoutController.setDefaultUrl("/?defaulturlafterlogout");
         //logoutController.setDestroySession(true);
         bind(LogoutController.class).toInstance(logoutController);
+    }
+
+    private int random(final int max) {
+        return (int) (Math.random() * (double) max);
+    }
+
+    private void wait(final int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (final Exception e) {}
     }
 }
