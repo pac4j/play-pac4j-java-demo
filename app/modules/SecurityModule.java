@@ -37,6 +37,7 @@ import org.pac4j.saml.client.SAML2ClientConfiguration;
 import play.Configuration;
 import play.Environment;
 import play.cache.SyncCacheApi;
+import util.Utils;
 
 import java.io.File;
 
@@ -108,10 +109,9 @@ public class SecurityModule extends AbstractModule {
         // Fake blocking authentication
         final Authenticator<UsernamePasswordCredentials> blockingAuthenticator = (credentials, ctx) -> {
 
-            final int wait = 50 + random(200);
-            wait(wait);
+            final int wait = Utils.block();
 
-            if (random(10) <= 7) {
+            if (Utils.random(10) <= 7) {
                 CommonProfile profile = new CommonProfile();
                 profile.setId("fake" + wait);
                 credentials.setUserProfile(profile);
@@ -143,15 +143,5 @@ public class SecurityModule extends AbstractModule {
         logoutController.setDefaultUrl("/?defaulturlafterlogout");
         //logoutController.setDestroySession(true);
         bind(LogoutController.class).toInstance(logoutController);
-    }
-
-    private int random(final int max) {
-        return (int) (Math.random() * (double) max);
-    }
-
-    private void wait(final int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (final Exception e) {}
     }
 }

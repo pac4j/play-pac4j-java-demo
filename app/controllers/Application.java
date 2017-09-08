@@ -23,6 +23,7 @@ import org.pac4j.play.store.PlaySessionStore;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.twirl.api.Content;
+import util.Utils;
 
 import java.util.List;
 
@@ -101,6 +102,9 @@ public class Application extends Controller {
 
     @Secure(clients = "DirectBasicAuthClient,ParameterClient,DirectFormClient")
     public Result dbaIndex() {
+
+        Utils.block();
+
         return protectedIndexView();
     }
 
