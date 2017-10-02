@@ -60,8 +60,8 @@ public class SecurityModule extends AbstractModule {
 
         bind(Pac4jRoleHandler.class).to(MyPac4jRoleHandler.class);
         final PlayCacheSessionStore playCacheSessionStore = new PlayCacheSessionStore(getProvider(SyncCacheApi.class));
-        bind(PlaySessionStore.class).toInstance(playCacheSessionStore);
-        //bind(PlaySessionStore.class).to(PlayCacheSessionStore.class);
+        //bind(PlaySessionStore.class).toInstance(playCacheSessionStore);
+        bind(PlaySessionStore.class).to(PlayCacheSessionStore.class);
 
         final String fbId = configuration.getString("fbId");
         final String fbSecret = configuration.getString("fbSecret");
