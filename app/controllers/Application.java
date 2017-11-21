@@ -60,6 +60,15 @@ public class Application extends Controller {
         return protectedIndexView();
     }
 
+    private Result notProtectedIndexView() {
+        // profiles
+        return ok(views.html.notprotectedIndex.render(getProfiles()));
+    }
+
+    public Result facebookNotProtectedIndex() {
+        return notProtectedIndexView();
+    }
+
     @Secure(clients = "FacebookClient", authorizers = "admin")
     public Result facebookAdminIndex() {
         return protectedIndexView();

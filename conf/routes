@@ -8,6 +8,7 @@ GET         /loginForm                        controllers.Application.loginForm(
 GET         /facebook/index.html              controllers.Application.facebookIndex()
 GET         /facebookadmin/index.html         controllers.Application.facebookAdminIndex()
 GET         /facebookcustom/index.html        controllers.Application.facebookCustomIndex()
+GET         /facebook/notprotected.html       controllers.Application.facebookNotProtectedIndex()
 GET         /twitter/index.html               controllers.Application.twitterIndex()
 GET         /form/index.html                  controllers.Application.formIndex()
 GET         /form/index.html.json             controllers.Application.formIndexJson()
