@@ -6,19 +6,22 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 scalaVersion := "2.11.8"
 
+val playPac4jVersion = "3.1.0-SNAPSHOT"
+val pac4jVersion = "2.1.0"
+
 libraryDependencies ++= Seq(
-  "org.pac4j" % "play-pac4j" % "3.0.1",
-  "org.pac4j" % "pac4j-http" % "2.0.0",
-  "org.pac4j" % "pac4j-cas" % "2.0.0",
-  "org.pac4j" % "pac4j-openid" % "2.0.0" exclude("xml-apis" , "xml-apis"),
-  "org.pac4j" % "pac4j-oauth" % "2.0.0",
-  "org.pac4j" % "pac4j-saml" % "2.0.0",
-  "org.pac4j" % "pac4j-oidc" % "2.0.0" exclude("commons-io" , "commons-io"),
-  "org.pac4j" % "pac4j-gae" % "2.0.0",
-  "org.pac4j" % "pac4j-jwt" % "2.0.0" exclude("commons-io" , "commons-io"),
-  "org.pac4j" % "pac4j-ldap" % "2.0.0",
-  "org.pac4j" % "pac4j-sql" % "2.0.0",
-  "org.pac4j" % "pac4j-mongo" % "2.0.0",
+  "org.pac4j" % "play-pac4j" % playPac4jVersion,
+  "org.pac4j" % "pac4j-http" % pac4jVersion,
+  "org.pac4j" % "pac4j-cas" % pac4jVersion,
+  "org.pac4j" % "pac4j-openid" % pac4jVersion exclude("xml-apis" , "xml-apis"),
+  "org.pac4j" % "pac4j-oauth" % pac4jVersion,
+  "org.pac4j" % "pac4j-saml" % pac4jVersion,
+  "org.pac4j" % "pac4j-oidc" % pac4jVersion exclude("commons-io" , "commons-io"),
+  "org.pac4j" % "pac4j-gae" % pac4jVersion,
+  "org.pac4j" % "pac4j-jwt" % pac4jVersion exclude("commons-io" , "commons-io"),
+  "org.pac4j" % "pac4j-ldap" % pac4jVersion,
+  "org.pac4j" % "pac4j-sql" % pac4jVersion,
+  "org.pac4j" % "pac4j-mongo" % pac4jVersion,
   "org.pac4j" % "pac4j-stormpath" % "2.0.0",
   "com.typesafe.play" % "play-cache_2.11" % "2.5.8",
   "commons-io" % "commons-io" % "2.4",
