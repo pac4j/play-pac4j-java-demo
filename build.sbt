@@ -1,12 +1,12 @@
 name := "play-pac4j-java-demo"
 
-version := "4.0.0-SNAPSHOT"
+version := "4.1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 scalaVersion := "2.12.2"
 
-val playPac4jVersion = "4.0.0"
+val playPac4jVersion = "4.1.0-SNAPSHOT"
 val pac4jVersion = "2.1.0"
 val playVersion = "2.6.6"
 
@@ -32,6 +32,6 @@ libraryDependencies ++= Seq(
   "be.objectify" %% "deadbolt-java" % "2.6.1"
 )
 
-resolvers ++= Seq(Resolver.mavenLocal) //, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/")
+resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/")
 
 routesGenerator := InjectedRoutesGenerator
