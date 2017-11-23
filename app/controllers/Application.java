@@ -55,7 +55,7 @@ public class Application extends Controller {
         return ok(views.html.protectedIndex.render(getProfiles()));
     }
 
-    //@Secure(clients = "FacebookClient")
+    @Secure(clients = "FacebookClient", matchers = "excludedPath")
     public Result facebookIndex() {
         return protectedIndexView();
     }
