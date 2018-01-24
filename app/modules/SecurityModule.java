@@ -112,8 +112,8 @@ public class SecurityModule extends AbstractModule {
     protected CasClient provideCasClient(CasProxyReceptor casProxyReceptor) {
         // final CasOAuthWrapperClient casClient = new CasOAuthWrapperClient("this_is_the_key2", "this_is_the_secret2", "http://localhost:8080/cas2/oauth2.0");
         // casClient.setName("CasClient");
-        //final CasConfiguration casConfiguration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
-        final CasConfiguration casConfiguration = new CasConfiguration("http://localhost:8888/cas/login");
+        final CasConfiguration casConfiguration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
+        //final CasConfiguration casConfiguration = new CasConfiguration("http://localhost:8888/cas/login");
         casConfiguration.setProxyReceptor(casProxyReceptor);
         return new CasClient(casConfiguration);
     }
