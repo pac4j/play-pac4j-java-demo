@@ -2,6 +2,7 @@ package modules;
 
 import be.objectify.deadbolt.java.cache.HandlerCache;
 import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 import com.google.inject.Provides;
 import controllers.CustomAuthorizer;
 import controllers.DemoHttpActionAdapter;
@@ -109,12 +110,12 @@ public class SecurityModule extends AbstractModule {
     }
 
     @Provides
-    protected CasClient provideCasClient(CasProxyReceptor casProxyReceptor) {
+    @Inject
+    protected CasClient provideCasClient() {
         // final CasOAuthWrapperClient casClient = new CasOAuthWrapperClient("this_is_the_key2", "this_is_the_secret2", "http://localhost:8080/cas2/oauth2.0");
         // casClient.setName("CasClient");
         final CasConfiguration casConfiguration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
         //final CasConfiguration casConfiguration = new CasConfiguration("http://localhost:8888/cas/login");
-        casConfiguration.setProxyReceptor(casProxyReceptor);
         return new CasClient(casConfiguration);
     }
 
@@ -174,9 +175,12 @@ public class SecurityModule extends AbstractModule {
                                    IndirectBasicAuthClient indirectBasicAuthClient, CasClient casClient, SAML2Client saml2Client,
                                    OidcClient oidcClient, ParameterClient parameterClient, DirectBasicAuthClient directBasicAuthClient,
                                    CasProxyReceptor casProxyReceptor, DirectFormClient directFormClient) {
+
+        //casClient.getConfiguration().setProxyReceptor(casProxyReceptor);
+
         final Clients clients = new Clients(baseUrl + "/callback", facebookClient, twitterClient, formClient,
                 indirectBasicAuthClient, casClient, saml2Client, oidcClient, parameterClient, directBasicAuthClient,
-                new AnonymousClient(), casProxyReceptor, directFormClient);
+                new AnonymousClient(), directFormClient);
 
         final Config config = new Config(clients);
         config.addAuthorizer("admin", new RequireAnyRoleAuthorizer<>("ROLE_ADMIN"));
