@@ -32,6 +32,6 @@ libraryDependencies ++= Seq(
   "be.objectify" %% "deadbolt-java" % "2.6.1"
 )
 
-resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/")
+resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/")
 
 routesGenerator := InjectedRoutesGenerator
