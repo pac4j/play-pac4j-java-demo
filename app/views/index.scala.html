@@ -1,4 +1,4 @@
-@(profileList: java.util.List[org.pac4j.core.profile.CommonProfile], token: String, sessionId: String)
+@(profileList: java.util.List[org.pac4j.core.profile.CommonProfile], token: String, sessionId: String, userForm: Form[MyUser])
 @import scala.collection.JavaConverters._
 @profiles() = { @profileList.toList }
 <h1>index</h1>
@@ -24,6 +24,11 @@
     <input type="submit" value="Protected by CSRF token: /csrf/index.html" />
 </form>
 <a href="forceLogin?client_name=FacebookClient">Force Facebook login</a> (even if already authenticated)<br />
+<br />
+@helper.form(action = routes.Application.submit()) {
+    @helper.inputText(userForm("name"))
+    <input type="submit" value="helper.form" />
+}
 <br />
 <a href="/logout?url=/?forcepostlogouturl">local logout</a><br />
 <br/>

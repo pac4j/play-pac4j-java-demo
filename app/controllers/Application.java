@@ -19,6 +19,7 @@ import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.play.PlayWebContext;
 import org.pac4j.play.java.Secure;
 import org.pac4j.play.store.PlaySessionStore;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.twirl.api.Content;
@@ -34,6 +35,9 @@ public class Application extends Controller {
     @Inject
     private PlaySessionStore playSessionStore;
 
+    @Inject
+    private FormFactory formFactory;
+
     private List<CommonProfile> getProfiles() {
         final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
         final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
@@ -46,7 +50,7 @@ public class Application extends Controller {
         final String sessionId = context.getSessionStore().getOrCreateSessionId(context);
         final String token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN);
         // profiles (maybe be empty if not authenticated)
-        return ok(views.html.index.render(getProfiles(), token, sessionId));
+        return ok(views.html.index.render(getProfiles(), token, sessionId, formFactory.form(MyUser.class)));
     }
 
     private Result protectedIndexView() {
@@ -172,5 +176,9 @@ public class Application extends Controller {
         } catch (final HttpAction e) {
             throw new TechnicalException(e);
         }
+    }
+
+    public Result submit() {
+        return ok(views.html.form.render());
     }
 }
