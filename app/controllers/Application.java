@@ -139,6 +139,7 @@ public class Application extends Controller {
     }
 
     //@Secure(clients = "ParameterClient")
+    //@SubjectPresent(handlerKey = "ParameterClient")
     public Result restJwtIndex() {
         return protectedIndexView();
     }

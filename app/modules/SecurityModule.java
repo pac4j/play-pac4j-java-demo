@@ -62,9 +62,10 @@ public class SecurityModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(HandlerCache.class).to(Pac4jHandlerCache.class);
 
+        bind(HandlerCache.class).to(Pac4jHandlerCache.class);
         bind(Pac4jRoleHandler.class).to(MyPac4jRoleHandler.class);
+
         final PlayCacheSessionStore playCacheSessionStore = new PlayCacheSessionStore(getProvider(SyncCacheApi.class));
         //bind(PlaySessionStore.class).toInstance(playCacheSessionStore);
         bind(PlaySessionStore.class).to(PlayCacheSessionStore.class);
@@ -73,6 +74,7 @@ public class SecurityModule extends AbstractModule {
         final CallbackController callbackController = new CallbackController();
         callbackController.setDefaultUrl("/");
         callbackController.setMultiProfile(true);
+        callbackController.setRenewSession(true);
         bind(CallbackController.class).toInstance(callbackController);
 
         // logout
