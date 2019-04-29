@@ -1,6 +1,7 @@
 package controllers;
 
 import play.*;
+import com.typesafe.config.Config;
 import play.api.OptionalSourceMapper;
 import play.api.UsefulException;
 import play.api.routing.Router;
@@ -15,7 +16,7 @@ import java.util.concurrent.CompletionStage;
 public class CustomErrorHandler extends DefaultHttpErrorHandler {
 
     @Inject
-    public CustomErrorHandler(Configuration configuration, Environment environment,
+    public CustomErrorHandler(Config configuration, Environment environment,
                         OptionalSourceMapper sourceMapper, Provider<Router> routes) {
         super(configuration, environment, sourceMapper, routes);
     }
