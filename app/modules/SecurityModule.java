@@ -36,7 +36,6 @@ import org.pac4j.play.store.PlayCacheSessionStore;
 import org.pac4j.play.store.PlaySessionStore;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
-import play.Configuration;
 import play.Environment;
 
 import java.io.File;
@@ -49,13 +48,13 @@ public class SecurityModule extends AbstractModule {
 
     public final static String JWT_SALT = "12345678901234567890123456789012";
 
-    private final Configuration configuration;
+    private final com.typesafe.config.Config configuration;
 
     private static class MyPac4jRoleHandler implements Pac4jRoleHandler { }
 
     private final String baseUrl;
 
-    public SecurityModule(final Environment environment, final Configuration configuration) {
+    public SecurityModule(final Environment environment, final com.typesafe.config.Config configuration) {
         this.configuration = configuration;
         this.baseUrl = configuration.getString("baseUrl");
     }
