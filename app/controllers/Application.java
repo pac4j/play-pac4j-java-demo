@@ -8,8 +8,8 @@ import org.pac4j.cas.profile.CasProxyProfile;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.Pac4jConstants;
-import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.exception.TechnicalException;
+import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.util.CommonHelper;
@@ -17,6 +17,7 @@ import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.play.PlayWebContext;
+import org.pac4j.play.http.PlayHttpActionAdapter;
 import org.pac4j.play.java.Secure;
 import org.pac4j.play.store.PlaySessionStore;
 import play.mvc.Controller;
@@ -40,11 +41,11 @@ public class Application extends Controller {
         return profileManager.getAll(true);
     }
 
-    @Secure(clients = "AnonymousClient", authorizers = "csrfToken")
+    @Secure(clients = "AnonymousClient")
     public Result index() throws Exception {
         final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
         final String sessionId = context.getSessionStore().getOrCreateSessionId(context);
-        final String token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN);
+        final String token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN).orElse(null);
         // profiles (maybe be empty if not authenticated)
         return ok(views.html.index.render(getProfiles(), token, sessionId));
     }
@@ -150,7 +151,7 @@ public class Application extends Controller {
     }
 
     public Result loginForm() throws TechnicalException {
-        final FormClient formClient = (FormClient) config.getClients().findClient("FormClient");
+        final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
         return ok(views.html.loginForm.render(formClient.getCallbackUrl()));
     }
 
@@ -166,10 +167,10 @@ public class Application extends Controller {
 
     public Result forceLogin() {
         final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
-        final Client client = config.getClients().findClient(context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER));
+        final Client client = config.getClients().findClient(context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER).get()).get();
         try {
-            final HttpAction action = client.redirect(context);
-            return (Result) config.getHttpActionAdapter().adapt(action.getCode(), context);
+            final HttpAction action = (HttpAction) client.getRedirectionAction(context).get();
+            return (Result) PlayHttpActionAdapter.INSTANCE.adapt(action, context);
         } catch (final HttpAction e) {
             throw new TechnicalException(e);
         }

@@ -5,7 +5,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import controllers.CustomAuthorizer;
-import controllers.DemoHttpActionAdapter;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.CasProxyReceptor;
 import org.pac4j.cas.config.CasConfiguration;
@@ -13,9 +12,10 @@ import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
-import org.pac4j.core.matching.PathMatcher;
+import org.pac4j.core.matching.matcher.PathMatcher;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.direct.ParameterClient;
@@ -32,17 +32,22 @@ import org.pac4j.play.CallbackController;
 import org.pac4j.play.LogoutController;
 import org.pac4j.play.deadbolt2.Pac4jHandlerCache;
 import org.pac4j.play.deadbolt2.Pac4jRoleHandler;
+import org.pac4j.play.http.PlayHttpActionAdapter;
 import org.pac4j.play.store.PlayCacheSessionStore;
 import org.pac4j.play.store.PlaySessionStore;
 import org.pac4j.saml.client.SAML2Client;
-import org.pac4j.saml.client.SAML2ClientConfiguration;
+import org.pac4j.saml.config.SAML2Configuration;
 import play.Environment;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.pac4j.http.client.direct.DirectFormClient;
 import play.cache.SyncCacheApi;
 import util.Utils;
+
+import static play.mvc.Results.forbidden;
+import static play.mvc.Results.unauthorized;
 
 public class SecurityModule extends AbstractModule {
 
@@ -87,7 +92,10 @@ public class SecurityModule extends AbstractModule {
     protected FacebookClient provideFacebookClient() {
         final String fbId = configuration.getString("fbId");
         final String fbSecret = configuration.getString("fbSecret");
-        return new FacebookClient(fbId, fbSecret);
+        final FacebookClient fbClient = new FacebookClient(fbId, fbSecret);
+        fbClient.setCallbackUrl("https://localhost/callback");
+        return fbClient;
+
     }
 
     @Provides
@@ -122,7 +130,7 @@ public class SecurityModule extends AbstractModule {
 
     @Provides
     protected SAML2Client provideSaml2Client() {
-        final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration("resource:samlKeystore.jks",
+        final SAML2Configuration cfg = new SAML2Configuration("resource:samlKeystore.jks",
                 "pac4j-demo-passwd", "pac4j-demo-passwd", "resource:openidp-feide.xml");
         cfg.setMaximumAuthenticationLifetime(3600);
         cfg.setServiceProviderEntityId("urn:mace:saml:pac4j.org");
@@ -138,7 +146,7 @@ public class SecurityModule extends AbstractModule {
         oidcConfiguration.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
         oidcConfiguration.addCustomParam("prompt", "consent");
         final OidcClient oidcClient = new OidcClient(oidcConfiguration);
-        oidcClient.addAuthorizationGenerator((ctx, profile) -> { profile.addRole("ROLE_ADMIN"); return profile; });
+        oidcClient.addAuthorizationGenerator((ctx, profile) -> { profile.addRole("ROLE_ADMIN"); return Optional.of(profile); });
         return oidcClient;
     }
 
@@ -183,11 +191,15 @@ public class SecurityModule extends AbstractModule {
                 indirectBasicAuthClient, casClient, saml2Client, oidcClient, parameterClient, directBasicAuthClient,
                 new AnonymousClient(), directFormClient);
 
+        PlayHttpActionAdapter.INSTANCE.getResults().put(HttpConstants.UNAUTHORIZED, unauthorized(views.html.error401.render().toString()).as((HttpConstants.HTML_CONTENT_TYPE)));
+        PlayHttpActionAdapter.INSTANCE.getResults().put(HttpConstants.FORBIDDEN, forbidden(views.html.error403.render().toString()).as((HttpConstants.HTML_CONTENT_TYPE)));
+
         final Config config = new Config(clients);
         config.addAuthorizer("admin", new RequireAnyRoleAuthorizer<>("ROLE_ADMIN"));
         config.addAuthorizer("custom", new CustomAuthorizer());
         config.addMatcher("excludedPath", new PathMatcher().excludeRegex("^/facebook/notprotected\\.html$"));
-        config.setHttpActionAdapter(new DemoHttpActionAdapter());
+        // for deadbolt:
+        config.setHttpActionAdapter(PlayHttpActionAdapter.INSTANCE);
         return config;
     }
 }

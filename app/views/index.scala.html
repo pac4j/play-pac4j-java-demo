@@ -23,6 +23,10 @@
     Token: @token<br />
     <input type="submit" value="Protected by CSRF token: /csrf/index.html" />
 </form>
+<form method="POST" action="/csrf/index.html">
+    Token: none<br />
+    <input type="submit" value="Protected by CSRF token: /csrf/index.html" />
+</form>
 <a href="forceLogin?client_name=FacebookClient">Force Facebook login</a> (even if already authenticated)<br />
 <br />
 <a href="/logout?url=/?forcepostlogouturl">local logout</a><br />
