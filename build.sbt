@@ -1,13 +1,13 @@
 name := "play-pac4j-java-demo"
 
-version := "9.0.0-SNAPSHOT"
+version := "9.0.0-RC3-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 scalaVersion := "2.12.4"
 
-val playPac4jVersion = "9.0.0-SNAPSHOT"
-val pac4jVersion = "3.8.3"
+val playPac4jVersion = "9.0.0-RC3-SNAPSHOT"
+val pac4jVersion = "4.0.0-RC3-SNAPSHOT"
 val playVersion = "2.7.2"
 val guiceVersion = "4.2.0"
 
