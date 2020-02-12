@@ -35,7 +35,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-couch" % pac4jVersion,
   "com.typesafe.play" % "play-cache_2.12" % playVersion,
   "commons-io" % "commons-io" % "2.6",
-  "be.objectify" %% "deadbolt-java" % "2.6.1",
+  "be.objectify" %% "deadbolt-java" % "2.8.0",
 
   //For Java > 8
   "javax.xml.bind" % "jaxb-api" % "2.3.1",
