@@ -15,4 +15,4 @@ To test, you can call a protected url by clicking on the "Protected url by **xxx
 
 ## Live demo
 
-Find a live demo on Heroku: [http://play-pac4j-java-demo.herokuapp.com](http://play-pac4j-java-demo.herokuapp.com/)
+Find a live demo on Heroku: [https://play-pac4j-java-demo.herokuapp.com](https://play-pac4j-java-demo.herokuapp.com/)
