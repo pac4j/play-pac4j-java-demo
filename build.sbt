@@ -8,7 +8,7 @@ scalaVersion := "2.12.4"
 
 val playPac4jVersion = "9.0.0-RC3-SNAPSHOT"
 val pac4jVersion = "4.0.0-RC3-SNAPSHOT"
-val playVersion = "2.7.2"
+val playVersion = "2.7.4"
 val guiceVersion = "4.2.0"
 
 val guiceDeps = Seq(
@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-kerberos" % pac4jVersion exclude("org.springframework", "spring-core"),
   "org.pac4j" % "pac4j-couch" % pac4jVersion,
   "com.typesafe.play" % "play-cache_2.12" % playVersion,
-  "commons-io" % "commons-io" % "2.4",
+  "commons-io" % "commons-io" % "2.6",
   "be.objectify" %% "deadbolt-java" % "2.6.1",
 
   //For Java > 8
