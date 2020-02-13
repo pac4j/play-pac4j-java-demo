@@ -93,7 +93,10 @@ public class SecurityModule extends AbstractModule {
         final String fbId = configuration.getString("fbId");
         final String fbSecret = configuration.getString("fbSecret");
         final FacebookClient fbClient = new FacebookClient(fbId, fbSecret);
-        fbClient.setCallbackUrl("https://localhost/callback");
+        final String baseUrl = configuration.getString("baseUrl");
+        if (baseUrl.contains("9000")) {
+            fbClient.setCallbackUrl("https://localhost/callback");
+        }
         return fbClient;
 
     }

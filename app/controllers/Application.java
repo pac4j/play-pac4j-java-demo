@@ -21,6 +21,7 @@ import org.pac4j.play.http.PlayHttpActionAdapter;
 import org.pac4j.play.java.Secure;
 import org.pac4j.play.store.PlaySessionStore;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.twirl.api.Content;
 import util.Utils;
@@ -35,91 +36,91 @@ public class Application extends Controller {
     @Inject
     private PlaySessionStore playSessionStore;
 
-    private List<CommonProfile> getProfiles() {
-        final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
+    private List<CommonProfile> getProfiles(Http.Request request) {
+        final PlayWebContext context = new PlayWebContext(request, playSessionStore);
         final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
         return profileManager.getAll(true);
     }
 
     @Secure(clients = "AnonymousClient")
-    public Result index() throws Exception {
-        final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
+    public Result index(Http.Request request) throws Exception {
+        final PlayWebContext context = new PlayWebContext(request, playSessionStore);
         final String sessionId = context.getSessionStore().getOrCreateSessionId(context);
         final String token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN).orElse(null);
         // profiles (maybe be empty if not authenticated)
-        return ok(views.html.index.render(getProfiles(), token, sessionId));
+        return ok(views.html.index.render(getProfiles(request), token, sessionId));
     }
 
-    private Result protectedIndexView() {
+    private Result protectedIndexView(Http.Request request) {
         // profiles
-        return ok(views.html.protectedIndex.render(getProfiles()));
+        return ok(views.html.protectedIndex.render(getProfiles(request)));
     }
 
     @Secure(clients = "FacebookClient", matchers = "excludedPath")
-    public Result facebookIndex() {
-        return protectedIndexView();
+    public Result facebookIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
-    private Result notProtectedIndexView() {
+    private Result notProtectedIndexView(Http.Request request) {
         // profiles
-        return ok(views.html.notprotectedIndex.render(getProfiles()));
+        return ok(views.html.notprotectedIndex.render(getProfiles(request)));
     }
 
-    public Result facebookNotProtectedIndex() {
-        return notProtectedIndexView();
+    public Result facebookNotProtectedIndex(Http.Request request) {
+        return notProtectedIndexView(request);
     }
 
     @Secure(clients = "FacebookClient", authorizers = "admin")
-    public Result facebookAdminIndex() {
-        return protectedIndexView();
+    public Result facebookAdminIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
     @Secure(clients = "FacebookClient", authorizers = "custom")
-    public Result facebookCustomIndex() {
-        return protectedIndexView();
+    public Result facebookCustomIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
     @Secure(clients = "TwitterClient,FacebookClient")
-    public Result twitterIndex() {
-        return protectedIndexView();
+    public Result twitterIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
     @Secure
-    public Result protectedIndex() {
-        return protectedIndexView();
+    public Result protectedIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
     //@Secure(clients = "FormClient")
     @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
-    public Result formIndex() {
-        return protectedIndexView();
+    public Result formIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
     // Setting the isAjax parameter is no longer necessary as AJAX requests are automatically detected:
     // a 401 error response will be returned instead of a redirection to the login url.
     @Secure(clients = "FormClient")
-    public Result formIndexJson() {
-        Content content = views.html.protectedIndex.render(getProfiles());
+    public Result formIndexJson(Http.Request request) {
+        Content content = views.html.protectedIndex.render(getProfiles(request));
         JsonContent jsonContent = new JsonContent(content.body());
         return ok(jsonContent);
     }
 
     @Secure(clients = "IndirectBasicAuthClient")
-    public Result basicauthIndex() {
-        return protectedIndexView();
+    public Result basicauthIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
     @Secure(clients = "DirectBasicAuthClient,ParameterClient,DirectFormClient")
-    public Result dbaIndex() {
+    public Result dbaIndex(Http.Request request) {
 
         Utils.block();
 
-        return protectedIndexView();
+        return protectedIndexView(request);
     }
 
     @Secure(clients = "CasClient")
-    public Result casIndex() {
-        final CommonProfile profile = getProfiles().get(0);
+    public Result casIndex(Http.Request request) {
+        final CommonProfile profile = getProfiles(request).get(0);
         final String service = "http://localhost:8080/proxiedService";
         String proxyTicket = null;
         if (profile instanceof CasProxyProfile) {
@@ -130,24 +131,24 @@ public class Application extends Controller {
     }
 
     @Secure(clients = "SAML2Client")
-    public Result samlIndex() {
-        return protectedIndexView();
+    public Result samlIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
     @Secure(clients = "OidcClient")
-    public Result oidcIndex() {
-        return protectedIndexView();
+    public Result oidcIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
     //@Secure(clients = "ParameterClient")
     //@SubjectPresent(handlerKey = "ParameterClient")
-    public Result restJwtIndex() {
-        return protectedIndexView();
+    public Result restJwtIndex(Http.Request request) {
+        return protectedIndexView(request);
     }
 
     //@Secure(clients = "AnonymousClient", authorizers = "csrfCheck")
-    public Result csrfIndex() {
-        return ok(views.html.csrf.render(getProfiles()));
+    public Result csrfIndex(Http.Request request) {
+        return ok(views.html.csrf.render(getProfiles(request)));
     }
 
     public Result loginForm() throws TechnicalException {
@@ -155,8 +156,8 @@ public class Application extends Controller {
         return ok(views.html.loginForm.render(formClient.getCallbackUrl()));
     }
 
-    public Result jwt() {
-        final List<CommonProfile> profiles = getProfiles();
+    public Result jwt(Http.Request request) {
+        final List<CommonProfile> profiles = getProfiles(request);
         final JwtGenerator generator = new JwtGenerator(new SecretSignatureConfiguration(SecurityModule.JWT_SALT));
         String token = "";
         if (CommonHelper.isNotEmpty(profiles)) {
@@ -165,8 +166,8 @@ public class Application extends Controller {
         return ok(views.html.jwt.render(token));
     }
 
-    public Result forceLogin() {
-        final PlayWebContext context = new PlayWebContext(ctx(), playSessionStore);
+    public Result forceLogin(Http.Request request) {
+        final PlayWebContext context = new PlayWebContext(request, playSessionStore);
         final Client client = config.getClients().findClient(context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER).get()).get();
         try {
             final HttpAction action = (HttpAction) client.getRedirectionAction(context).get();

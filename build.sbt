@@ -35,7 +35,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-couch" % pac4jVersion,
   "com.typesafe.play" % "play-cache_2.12" % playVersion,
   "commons-io" % "commons-io" % "2.6",
-  "be.objectify" %% "deadbolt-java" % "2.6.1",
+  "be.objectify" %% "deadbolt-java" % "2.7.1",
 
   //For Java > 8
   "javax.xml.bind" % "jaxb-api" % "2.3.0",
@@ -45,6 +45,6 @@ libraryDependencies ++= Seq(
 
 ) ++ guiceDeps //For Play 2.6 & JDK9
 
-resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/")
+resolvers ++= Seq(Resolver.mavenLocal)//, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/")
 
 routesGenerator := InjectedRoutesGenerator
