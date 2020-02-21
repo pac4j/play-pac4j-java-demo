@@ -43,7 +43,6 @@ import java.io.File;
 import java.util.Optional;
 
 import org.pac4j.http.client.direct.DirectFormClient;
-import play.cache.SyncCacheApi;
 import util.Utils;
 
 import static play.mvc.Results.forbidden;
@@ -70,7 +69,7 @@ public class SecurityModule extends AbstractModule {
         bind(HandlerCache.class).to(Pac4jHandlerCache.class);
         bind(Pac4jRoleHandler.class).to(MyPac4jRoleHandler.class);
 
-        final PlayCacheSessionStore playCacheSessionStore = new PlayCacheSessionStore(getProvider(SyncCacheApi.class));
+        //final PlayCacheSessionStore playCacheSessionStore = new PlayCacheSessionStore(getProvider(SyncCacheApi.class));
         //bind(PlaySessionStore.class).toInstance(playCacheSessionStore);
         bind(PlaySessionStore.class).to(PlayCacheSessionStore.class);
 

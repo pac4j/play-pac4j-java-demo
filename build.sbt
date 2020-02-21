@@ -7,9 +7,9 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 scalaVersion := "2.12.4"
 
 val playPac4jVersion = "9.0.0-RC3-SNAPSHOT"
-val pac4jVersion = "4.0.0-RC3-SNAPSHOT"
+val pac4jVersion = "4.0.0-RC3"
 val playVersion = "2.7.4"
-val guiceVersion = "4.2.0"
+val guiceVersion = "4.2.2"
 
 val guiceDeps = Seq(
   "com.google.inject" % "guice" % guiceVersion,
@@ -18,7 +18,8 @@ val guiceDeps = Seq(
 
 libraryDependencies ++= Seq(
   guice,
-  ehcache, // or cacheApi
+  caffeine,
+  //ehcache,
   "org.pac4j" %% "play-pac4j" % playPac4jVersion,
   "org.pac4j" % "pac4j-http" % pac4jVersion,
   "org.pac4j" % "pac4j-cas" % pac4jVersion,
