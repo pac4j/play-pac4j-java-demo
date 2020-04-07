@@ -1,14 +1,14 @@
 name := "play-pac4j-java-demo"
 
-version := "9.0.0-SNAPSHOT"
+version := "10.0.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 scalaVersion := "2.12.4"
 
-val playPac4jVersion = "9.0.0"
+val playPac4jVersion = "10.0.0-SNAPSHOT"
 val pac4jVersion = "4.0.0"
-val playVersion = "2.7.4"
+val playVersion = "2.8.0"
 val guiceVersion = "4.2.2"
 
 val guiceDeps = Seq(
@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-couch" % pac4jVersion,
   "com.typesafe.play" % "play-cache_2.12" % playVersion,
   "commons-io" % "commons-io" % "2.6",
-  "be.objectify" %% "deadbolt-java" % "2.7.1",
+  "be.objectify" %% "deadbolt-java" % "2.8.1",
 
   //For Java > 8
   "javax.xml.bind" % "jaxb-api" % "2.3.1",
