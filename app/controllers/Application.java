@@ -7,10 +7,11 @@ import modules.SecurityModule;
 import org.pac4j.cas.profile.CasProxyProfile;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.exception.http.HttpAction;
-import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
+import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.core.util.Pac4jConstants;
 import org.pac4j.http.client.indirect.FormClient;
@@ -19,7 +20,6 @@ import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.play.PlayWebContext;
 import org.pac4j.play.http.PlayHttpActionAdapter;
 import org.pac4j.play.java.Secure;
-import org.pac4j.play.store.PlaySessionStore;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -34,18 +34,18 @@ public class Application extends Controller {
     private Config config;
 
     @Inject
-    private PlaySessionStore playSessionStore;
+    private SessionStore playSessionStore;
 
-    private List<CommonProfile> getProfiles(Http.Request request) {
-        final PlayWebContext context = new PlayWebContext(request, playSessionStore);
-        final ProfileManager<CommonProfile> profileManager = new ProfileManager(context);
-        return profileManager.getAll(true);
+    private List<UserProfile> getProfiles(Http.Request request) {
+        final PlayWebContext context = new PlayWebContext(request);
+        final ProfileManager profileManager = new ProfileManager(context, playSessionStore);
+        return profileManager.getProfiles();
     }
 
     @Secure(clients = "AnonymousClient")
     public Result index(Http.Request request) throws Exception {
-        final PlayWebContext context = new PlayWebContext(request, playSessionStore);
-        final String sessionId = context.getSessionStore().getOrCreateSessionId(context);
+        final PlayWebContext context = new PlayWebContext(request);
+        final String sessionId = playSessionStore.getSessionId(context, false).orElse("nosession");
         final String token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN).orElse(null);
         // profiles (maybe be empty if not authenticated)
         return ok(views.html.index.render(getProfiles(request), token, sessionId));
@@ -120,7 +120,7 @@ public class Application extends Controller {
 
     @Secure(clients = "CasClient")
     public Result casIndex(Http.Request request) {
-        final CommonProfile profile = getProfiles(request).get(0);
+        final UserProfile profile = getProfiles(request).get(0);
         final String service = "http://localhost:8080/proxiedService";
         String proxyTicket = null;
         if (profile instanceof CasProxyProfile) {
@@ -157,7 +157,7 @@ public class Application extends Controller {
     }
 
     public Result jwt(Http.Request request) {
-        final List<CommonProfile> profiles = getProfiles(request);
+        final List<UserProfile> profiles = getProfiles(request);
         final JwtGenerator generator = new JwtGenerator(new SecretSignatureConfiguration(SecurityModule.JWT_SALT));
         String token = "";
         if (CommonHelper.isNotEmpty(profiles)) {
@@ -167,11 +167,11 @@ public class Application extends Controller {
     }
 
     public Result forceLogin(Http.Request request) {
-        final PlayWebContext context = new PlayWebContext(request, playSessionStore);
+        final PlayWebContext context = new PlayWebContext(request);
         final Client client = config.getClients().findClient(context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER).get()).get();
         try {
-            final HttpAction action = (HttpAction) client.getRedirectionAction(context).get();
-            return (Result) PlayHttpActionAdapter.INSTANCE.adapt(action, context);
+            final HttpAction action = client.getRedirectionAction(context, playSessionStore).get();
+            return PlayHttpActionAdapter.INSTANCE.adapt(action, context);
         } catch (final HttpAction e) {
             throw new TechnicalException(e);
         }

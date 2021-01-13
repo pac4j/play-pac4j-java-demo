@@ -4,6 +4,7 @@ import be.objectify.deadbolt.java.cache.HandlerCache;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import controllers.CustomAuthorizer;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.CasProxyReceptor;
@@ -13,7 +14,7 @@ import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.HttpConstants;
-import org.pac4j.core.credentials.UsernamePasswordCredentials;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.matching.matcher.PathMatcher;
 import org.pac4j.core.profile.CommonProfile;
@@ -34,7 +35,6 @@ import org.pac4j.play.deadbolt2.Pac4jHandlerCache;
 import org.pac4j.play.deadbolt2.Pac4jRoleHandler;
 import org.pac4j.play.http.PlayHttpActionAdapter;
 import org.pac4j.play.store.PlayCacheSessionStore;
-import org.pac4j.play.store.PlaySessionStore;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
 import play.Environment;
@@ -70,57 +70,53 @@ public class SecurityModule extends AbstractModule {
         bind(Pac4jRoleHandler.class).to(MyPac4jRoleHandler.class);
 
         //final PlayCacheSessionStore playCacheSessionStore = new PlayCacheSessionStore(getProvider(SyncCacheApi.class));
-        //bind(PlaySessionStore.class).toInstance(playCacheSessionStore);
-        bind(PlaySessionStore.class).to(PlayCacheSessionStore.class);
+        //bind(SessionStore.class).toInstance(playCacheSessionStore);
+        bind(SessionStore.class).to(PlayCacheSessionStore.class);
 
         // callback
         final CallbackController callbackController = new CallbackController();
         callbackController.setDefaultUrl("/");
-        callbackController.setMultiProfile(true);
         callbackController.setRenewSession(true);
         bind(CallbackController.class).toInstance(callbackController);
 
         // logout
         final LogoutController logoutController = new LogoutController();
         logoutController.setDefaultUrl("/?defaulturlafterlogout");
-        //logoutController.setDestroySession(true);
+        logoutController.setDestroySession(true);
         bind(LogoutController.class).toInstance(logoutController);
     }
 
-    @Provides
+    @Provides @Singleton
     protected FacebookClient provideFacebookClient() {
         final String fbId = configuration.getString("fbId");
         final String fbSecret = configuration.getString("fbSecret");
         final FacebookClient fbClient = new FacebookClient(fbId, fbSecret);
-        final String baseUrl = configuration.getString("baseUrl");
-        if (baseUrl.contains("9000")) {
-            fbClient.setCallbackUrl("https://localhost/callback");
-        }
+        fbClient.setMultiProfile(true);
         return fbClient;
 
     }
 
-    @Provides
+    @Provides @Singleton
     protected TwitterClient provideTwitterClient() {
         return new TwitterClient("HVSQGAw2XmiwcKOTvZFbQ", "FSiO9G9VRR4KCuksky0kgGuo8gAVndYymr4Nl7qc8AA");
     }
 
-    @Provides
+    @Provides @Singleton
     protected FormClient provideFormClient() {
         return new FormClient(baseUrl + "/loginForm", new SimpleTestUsernamePasswordAuthenticator());
     }
 
-    @Provides
+    @Provides @Singleton
     protected IndirectBasicAuthClient provideIndirectBasicAuthClient() {
         return new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
     }
 
-    @Provides
+    @Provides @Singleton
     protected CasProxyReceptor provideCasProxyReceptor() {
         return new CasProxyReceptor();
     }
 
-    @Provides
+    @Provides @Singleton
     @Inject
     protected CasClient provideCasClient() {
         // final CasOAuthWrapperClient casClient = new CasOAuthWrapperClient("this_is_the_key2", "this_is_the_secret2", "http://localhost:8080/cas2/oauth2.0");
@@ -130,7 +126,7 @@ public class SecurityModule extends AbstractModule {
         return new CasClient(casConfiguration);
     }
 
-    @Provides
+    @Provides @Singleton
     protected SAML2Client provideSaml2Client() {
         final SAML2Configuration cfg = new SAML2Configuration("resource:samlKeystore.jks",
                 "pac4j-demo-passwd", "pac4j-demo-passwd", "resource:openidp-feide.xml");
@@ -140,7 +136,7 @@ public class SecurityModule extends AbstractModule {
         return new SAML2Client(cfg);
     }
 
-    @Provides
+    @Provides @Singleton
     protected OidcClient provideOidcClient() {
         final OidcConfiguration oidcConfiguration = new OidcConfiguration();
         oidcConfiguration.setClientId("343992089165-i1es0qvej18asl33mvlbeq750i3ko32k.apps.googleusercontent.com");
@@ -148,11 +144,11 @@ public class SecurityModule extends AbstractModule {
         oidcConfiguration.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
         oidcConfiguration.addCustomParam("prompt", "consent");
         final OidcClient oidcClient = new OidcClient(oidcConfiguration);
-        oidcClient.addAuthorizationGenerator((ctx, profile) -> { profile.addRole("ROLE_ADMIN"); return Optional.of(profile); });
+        oidcClient.addAuthorizationGenerator((ctx, session, profile) -> { profile.addRole("ROLE_ADMIN"); return Optional.of(profile); });
         return oidcClient;
     }
 
-    @Provides
+    @Provides @Singleton
     protected ParameterClient provideParameterClient() {
         final ParameterClient parameterClient = new ParameterClient("token",
                 new JwtAuthenticator(new SecretSignatureConfiguration(JWT_SALT)));
@@ -161,9 +157,9 @@ public class SecurityModule extends AbstractModule {
         return parameterClient;
     }
 
-    @Provides
+    @Provides @Singleton
     protected DirectFormClient provideDirectFormClient() {
-        final Authenticator<UsernamePasswordCredentials> blockingAuthenticator = (credentials, ctx) -> {
+        final Authenticator blockingAuthenticator = (credentials, ctx, session) -> {
 
             final int wait = Utils.block();
 
@@ -176,12 +172,12 @@ public class SecurityModule extends AbstractModule {
         return new DirectFormClient(blockingAuthenticator);
     }
 
-    @Provides
+    @Provides @Singleton
     protected DirectBasicAuthClient provideDirectBasicAuthClient() {
         return new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
     }
 
-    @Provides
+    @Provides @Singleton
     protected Config provideConfig(FacebookClient facebookClient, TwitterClient twitterClient, FormClient formClient,
                                    IndirectBasicAuthClient indirectBasicAuthClient, CasClient casClient, SAML2Client saml2Client,
                                    OidcClient oidcClient, ParameterClient parameterClient, DirectBasicAuthClient directBasicAuthClient,
@@ -197,7 +193,7 @@ public class SecurityModule extends AbstractModule {
         PlayHttpActionAdapter.INSTANCE.getResults().put(HttpConstants.FORBIDDEN, forbidden(views.html.error403.render().toString()).as((HttpConstants.HTML_CONTENT_TYPE)));
 
         final Config config = new Config(clients);
-        config.addAuthorizer("admin", new RequireAnyRoleAuthorizer<>("ROLE_ADMIN"));
+        config.addAuthorizer("admin", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
         config.addAuthorizer("custom", new CustomAuthorizer());
         config.addMatcher("excludedPath", new PathMatcher().excludeRegex("^/facebook/notprotected\\.html$"));
         // for deadbolt:

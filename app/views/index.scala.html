@@ -1,6 +1,4 @@
-@(profileList: java.util.List[org.pac4j.core.profile.CommonProfile], token: String, sessionId: String)
-@import scala.collection.JavaConverters._
-@profiles() = { @profileList.toList }
+@(profileList: java.util.List[org.pac4j.core.profile.UserProfile], token: String, sessionId: String)
 <h1>index</h1>
 <a href="facebook/index.html">Protected url by Facebook : facebook/index.html</a> (use a real account)<br />
 <a href="facebookadmin/index.html">Protected url by Facebook with ROLE_ADMIN: facebookadmin/index.html</a> (use a real account)<br />
@@ -33,7 +31,7 @@
 <br/>
 <a href="/centralLogout?url=http://localhost:9000/?forcepostlogouturlafteridp">central logout</a>
 <br /><br />
-profiles: @profiles<br />
+profiles: @profileList<br />
 <br />
 sessionId: @sessionId
 <br /><br />
