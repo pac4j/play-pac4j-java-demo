@@ -6,8 +6,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 scalaVersion := "2.13.4"
 
-val playPac4jVersion = "11.0.0-PLAY2.8-RC1"
-val pac4jVersion = "5.0.0-RC1"
+val playPac4jVersion = "11.0.0-PLAY2.8-RC2-SNAPSHOT"
+val pac4jVersion = "5.0.0-RC2-SNAPSHOT"
 val playVersion = "2.8.7"
 val guiceVersion = "4.2.2"
 
@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-http" % pac4jVersion excludeAll(ExclusionRule(organization = "com.fasterxml.jackson.core")),
   "org.pac4j" % "pac4j-cas" % pac4jVersion exclude("com.fasterxml.jackson.core", "jackson-databind"),
   "org.pac4j" % "pac4j-oauth" % pac4jVersion excludeAll(ExclusionRule(organization = "com.fasterxml.jackson.core")),
-  "org.pac4j" % "pac4j-saml" % pac4jVersion exclude("org.springframework", "spring-core"),
+  "org.pac4j" % "pac4j-saml" % pac4jVersion excludeAll(ExclusionRule("org.springframework" , "spring-core"), ExclusionRule(organization = "com.fasterxml.jackson.core")),
   "org.pac4j" % "pac4j-oidc" % pac4jVersion  excludeAll(ExclusionRule("commons-io" , "commons-io"), ExclusionRule(organization = "com.fasterxml.jackson.core")),
   "org.pac4j" % "pac4j-gae" % pac4jVersion,
   "org.pac4j" % "pac4j-jwt" % pac4jVersion exclude("commons-io" , "commons-io"),
