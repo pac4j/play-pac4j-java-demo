@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-kerberos" % pac4jVersion exclude("org.springframework", "spring-core"),
   "org.pac4j" % "pac4j-couch" % pac4jVersion excludeAll(ExclusionRule(organization = "com.fasterxml.jackson.core")),
   "com.typesafe.play" % "play-cache_2.13" % playVersion,
-  "commons-io" % "commons-io" % "2.8.0",
+  "commons-io" % "commons-io" % "2.9.0",
   "be.objectify" %% "deadbolt-java" % "2.8.1",
 
   //For Java > 8
