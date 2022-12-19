@@ -1,11 +1,11 @@
 package modules;
 
-import be.objectify.deadbolt.java.cache.HandlerCache;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import controllers.CustomAuthorizer;
+import lombok.val;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.CasProxyReceptor;
 import org.pac4j.cas.config.CasConfiguration;
@@ -19,6 +19,7 @@ import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.matching.matcher.PathMatcher;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
+import org.pac4j.http.client.direct.DirectFormClient;
 import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
@@ -31,19 +32,16 @@ import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.play.CallbackController;
 import org.pac4j.play.LogoutController;
-import org.pac4j.play.deadbolt2.Pac4jHandlerCache;
-import org.pac4j.play.deadbolt2.Pac4jRoleHandler;
 import org.pac4j.play.http.PlayHttpActionAdapter;
 import org.pac4j.play.store.PlayCacheSessionStore;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
 import play.Environment;
+import play.cache.SyncCacheApi;
+import util.Utils;
 
 import java.io.File;
 import java.util.Optional;
-
-import org.pac4j.http.client.direct.DirectFormClient;
-import util.Utils;
 
 import static play.mvc.Results.forbidden;
 import static play.mvc.Results.unauthorized;
@@ -53,8 +51,6 @@ public class SecurityModule extends AbstractModule {
     public final static String JWT_SALT = "12345678901234567890123456789012";
 
     private final com.typesafe.config.Config configuration;
-
-    private static class MyPac4jRoleHandler implements Pac4jRoleHandler { }
 
     private final String baseUrl;
 
@@ -66,12 +62,8 @@ public class SecurityModule extends AbstractModule {
     @Override
     protected void configure() {
 
-        bind(HandlerCache.class).to(Pac4jHandlerCache.class);
-        bind(Pac4jRoleHandler.class).to(MyPac4jRoleHandler.class);
-
-        //final PlayCacheSessionStore playCacheSessionStore = new PlayCacheSessionStore(getProvider(SyncCacheApi.class));
-        //bind(SessionStore.class).toInstance(playCacheSessionStore);
-        bind(SessionStore.class).to(PlayCacheSessionStore.class);
+        val playCacheSessionStore = new PlayCacheSessionStore(getProvider(SyncCacheApi.class));
+        bind(SessionStore.class).toInstance(playCacheSessionStore);
 
         // callback
         final CallbackController callbackController = new CallbackController();
@@ -168,6 +160,8 @@ public class SecurityModule extends AbstractModule {
                 profile.setId("fake" + wait);
                 credentials.setUserProfile(profile);
             }
+
+            return Optional.of(credentials);
         };
         return new DirectFormClient(blockingAuthenticator);
     }
@@ -181,7 +175,8 @@ public class SecurityModule extends AbstractModule {
     protected Config provideConfig(FacebookClient facebookClient, TwitterClient twitterClient, FormClient formClient,
                                    IndirectBasicAuthClient indirectBasicAuthClient, CasClient casClient, SAML2Client saml2Client,
                                    OidcClient oidcClient, ParameterClient parameterClient, DirectBasicAuthClient directBasicAuthClient,
-                                   CasProxyReceptor casProxyReceptor, DirectFormClient directFormClient) {
+                                   CasProxyReceptor casProxyReceptor, DirectFormClient directFormClient,
+                                   SessionStore sessionStore) {
 
         //casClient.getConfiguration().setProxyReceptor(casProxyReceptor);
 
@@ -196,8 +191,9 @@ public class SecurityModule extends AbstractModule {
         config.addAuthorizer("admin", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
         config.addAuthorizer("custom", new CustomAuthorizer());
         config.addMatcher("excludedPath", new PathMatcher().excludeRegex("^/facebook/notprotected\\.html$"));
-        // for deadbolt:
-        config.setHttpActionAdapter(PlayHttpActionAdapter.INSTANCE);
+
+        config.setSessionStoreFactory(p -> sessionStore);
+
         return config;
     }
 }

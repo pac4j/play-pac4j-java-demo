@@ -1,16 +1,13 @@
 package controllers;
 
-import be.objectify.deadbolt.java.actions.SubjectPresent;
 import com.google.inject.Inject;
+import lombok.val;
 import model.JsonContent;
 import modules.SecurityModule;
 import org.pac4j.cas.profile.CasProxyProfile;
-import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.exception.http.HttpAction;
-import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.core.util.Pac4jConstants;
@@ -18,7 +15,7 @@ import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.play.PlayWebContext;
-import org.pac4j.play.http.PlayHttpActionAdapter;
+import org.pac4j.play.context.PlayFrameworkParameters;
 import org.pac4j.play.java.Secure;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -33,20 +30,21 @@ public class Application extends Controller {
     @Inject
     private Config config;
 
-    @Inject
-    private SessionStore playSessionStore;
-
     private List<UserProfile> getProfiles(Http.Request request) {
-        final PlayWebContext context = new PlayWebContext(request);
-        final ProfileManager profileManager = new ProfileManager(context, playSessionStore);
+        val parameters = new PlayFrameworkParameters(request);
+        val context = config.getWebContextFactory().newContext(parameters);
+        val sessionStore = config.getSessionStoreFactory().newSessionStore(parameters);
+        val profileManager = config.getProfileManagerFactory().apply(context, sessionStore);
         return profileManager.getProfiles();
     }
 
-    @Secure(clients = "AnonymousClient")
+    @Secure(clients = "AnonymousClient", matchers = "+csrfToken")
     public Result index(Http.Request request) throws Exception {
-        final PlayWebContext context = new PlayWebContext(request);
-        final String sessionId = playSessionStore.getSessionId(context, false).orElse("nosession");
-        final String token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN).orElse(null);
+        val parameters = new PlayFrameworkParameters(request);
+        val context = (PlayWebContext) config.getWebContextFactory().newContext(parameters);
+        val sessionStore = config.getSessionStoreFactory().newSessionStore(parameters);
+        val sessionId = sessionStore.getSessionId(context, false).orElse("nosession");
+        val token = (String) context.getRequestAttribute(Pac4jConstants.CSRF_TOKEN).orElse(null);
         // profiles (maybe be empty if not authenticated)
         return ok(views.html.index.render(getProfiles(request), token, sessionId));
     }
@@ -90,8 +88,7 @@ public class Application extends Controller {
         return protectedIndexView(request);
     }
 
-    //@Secure(clients = "FormClient")
-    @SubjectPresent(handlerKey = "FormClient", forceBeforeAuthCheck = true)
+    @Secure(clients = "FormClient")
     public Result formIndex(Http.Request request) {
         return protectedIndexView(request);
     }
@@ -140,8 +137,7 @@ public class Application extends Controller {
         return protectedIndexView(request);
     }
 
-    //@Secure(clients = "ParameterClient")
-    //@SubjectPresent(handlerKey = "ParameterClient")
+    @Secure(clients = "ParameterClient")
     public Result restJwtIndex(Http.Request request) {
         return protectedIndexView(request);
     }
@@ -167,11 +163,13 @@ public class Application extends Controller {
     }
 
     public Result forceLogin(Http.Request request) {
-        final PlayWebContext context = new PlayWebContext(request);
-        final Client client = config.getClients().findClient(context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER).get()).get();
+        val parameters = new PlayFrameworkParameters(request);
+        val context = config.getWebContextFactory().newContext(parameters);
+        val sessionStore = config.getSessionStoreFactory().newSessionStore(parameters);
+        val client = config.getClients().findClient(context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER).get()).get();
         try {
-            final HttpAction action = client.getRedirectionAction(context, playSessionStore).get();
-            return PlayHttpActionAdapter.INSTANCE.adapt(action, context);
+            val action = client.getRedirectionAction(context, sessionStore).get();
+            return (Result) config.getHttpActionAdapter().adapt(action, context);
         } catch (final HttpAction e) {
             throw new TechnicalException(e);
         }
