@@ -42,3 +42,5 @@ resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https
 resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/ivy-releases/"
 
 routesGenerator := InjectedRoutesGenerator
+
+ThisBuild / evictionErrorLevel := Level.Info
