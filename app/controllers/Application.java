@@ -168,7 +168,7 @@ public class Application extends Controller {
         val sessionStore = config.getSessionStoreFactory().newSessionStore(parameters);
         val client = config.getClients().findClient(context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER).get()).get();
         try {
-            val action = client.getRedirectionAction(context, sessionStore).get();
+            val action = client.getRedirectionAction(context, sessionStore, config.getProfileManagerFactory()).get();
             return (Result) config.getHttpActionAdapter().adapt(action, context);
         } catch (final HttpAction e) {
             throw new TechnicalException(e);
