@@ -136,7 +136,7 @@ public class SecurityModule extends AbstractModule {
         oidcConfiguration.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
         oidcConfiguration.addCustomParam("prompt", "consent");
         final OidcClient oidcClient = new OidcClient(oidcConfiguration);
-        oidcClient.addAuthorizationGenerator((ctx, session, profile) -> { profile.addRole("ROLE_ADMIN"); return Optional.of(profile); });
+        oidcClient.addAuthorizationGenerator((ctx, profile) -> { profile.addRole("ROLE_ADMIN"); return Optional.of(profile); });
         return oidcClient;
     }
 
@@ -151,7 +151,7 @@ public class SecurityModule extends AbstractModule {
 
     @Provides @Singleton
     protected DirectFormClient provideDirectFormClient() {
-        final Authenticator blockingAuthenticator = (credentials, ctx, session) -> {
+        final Authenticator blockingAuthenticator = (ctx, credentials) -> {
 
             final int wait = Utils.block();
 

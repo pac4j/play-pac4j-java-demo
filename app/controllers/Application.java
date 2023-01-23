@@ -6,6 +6,7 @@ import model.JsonContent;
 import modules.SecurityModule;
 import org.pac4j.cas.profile.CasProxyProfile;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.profile.UserProfile;
@@ -168,7 +169,7 @@ public class Application extends Controller {
         val sessionStore = config.getSessionStoreFactory().newSessionStore(parameters);
         val client = config.getClients().findClient(context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER).get()).get();
         try {
-            val action = client.getRedirectionAction(context, sessionStore, config.getProfileManagerFactory()).get();
+            val action = client.getRedirectionAction(new CallContext(context, sessionStore, config.getProfileManagerFactory())).get();
             return (Result) config.getHttpActionAdapter().adapt(action, context);
         } catch (final HttpAction e) {
             throw new TechnicalException(e);
