@@ -35,7 +35,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" % "play-cache_2.13" % playVersion,
   "ch.qos.logback" % "logback-classic" % "1.4.5",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.2",
-  "org.projectlombok" % "lombok" % "1.18.24"
+  "org.projectlombok" % "lombok" % "1.18.26"
 )
 
 resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/")
