@@ -12,7 +12,7 @@ val playVersion = "2.8.19"
 
 libraryDependencies += guice
 libraryDependencies ++= Seq(
-  "com.google.inject"            % "guice"                % "5.1.0",
+  "com.google.inject"            % "guice"                % "7.0.0",
   "com.google.inject.extensions" % "guice-assistedinject" % "7.0.0"
 )
 
