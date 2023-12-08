@@ -6,14 +6,14 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 scalaVersion := "2.13.12"
 
-val playPac4jVersion = "12.0.0-PLAY2.8-RC1"
-val pac4jVersion = "6.0.0-RC10"
+val playPac4jVersion = "12.0.0-PLAY2.8-SNAPSHOT"
+val pac4jVersion = "6.0.0-SNAPSHOT"
 val playVersion = "2.9.0"
 
 libraryDependencies += guice
 libraryDependencies ++= Seq(
-  "com.google.inject"            % "guice"                % "7.0.0",
-  "com.google.inject.extensions" % "guice-assistedinject" % "7.0.0"
+  "com.google.inject"            % "guice"                % "6.0.0",
+  "com.google.inject.extensions" % "guice-assistedinject" % "6.0.0"
 )
 
 libraryDependencies ++= Seq(
