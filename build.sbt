@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-kerberos" % pac4jVersion exclude("org.springframework", "spring-core"),
   "org.pac4j" % "pac4j-couch" % pac4jVersion excludeAll (ExclusionRule(organization = "com.fasterxml.jackson.core")),
   "com.typesafe.play" % "play-cache_2.13" % playVersion,
-  "ch.qos.logback" % "logback-classic" % "1.4.14",
+  "ch.qos.logback" % "logback-classic" % "1.5.0",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.16.1",
   "org.projectlombok" % "lombok" % "1.18.30"
 )
