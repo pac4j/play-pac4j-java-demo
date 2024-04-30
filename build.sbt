@@ -8,7 +8,7 @@ scalaVersion := "2.13.14"
 
 val playPac4jVersion = "12.0.0-PLAY2.8-SNAPSHOT"
 val pac4jVersion = "6.0.2"
-val playVersion = "2.9.2"
+val playVersion = "2.8.20"
 
 libraryDependencies += guice
 libraryDependencies ++= Seq(
@@ -35,7 +35,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" % "play-cache_2.13" % playVersion,
   "ch.qos.logback" % "logback-classic" % "1.5.6",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.16.1",
-  "org.projectlombok" % "lombok" % "1.18.32"
+  "org.projectlombok" % "lombok" % "1.18.32",
+  "org.springframework" % "spring-context" % "6.1.6"
 )
 
 resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/")
