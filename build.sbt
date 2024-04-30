@@ -4,9 +4,10 @@ version := "12.0.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
-scalaVersion := "2.13.13"
+//scalaVersion := "2.13.14"
+scalaVersion := "3.3.3"
 
-val playPac4jVersion = "12.0.0-PLAY2.8-SNAPSHOT"
+val playPac4jVersion = "12.0.0-PLAY3.0"
 val pac4jVersion = "6.0.2"
 val playVersion = "2.9.2"
 
@@ -32,7 +33,7 @@ libraryDependencies ++= Seq(
   "org.pac4j" % "pac4j-mongo" % pac4jVersion excludeAll (ExclusionRule(organization = "com.fasterxml.jackson.core")),
   "org.pac4j" % "pac4j-kerberos" % pac4jVersion exclude("org.springframework", "spring-core"),
   "org.pac4j" % "pac4j-couch" % pac4jVersion excludeAll (ExclusionRule(organization = "com.fasterxml.jackson.core")),
-  "com.typesafe.play" % "play-cache_2.13" % playVersion,
+//  "com.typesafe.play" % "play-cache_2.13" % playVersion,
   "ch.qos.logback" % "logback-classic" % "1.5.6",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.16.1",
   "org.projectlombok" % "lombok" % "1.18.32"
