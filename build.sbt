@@ -35,7 +35,7 @@ libraryDependencies ++= Seq(
   "org.playframework" % "play-cache_3" % playVersion,
   "ch.qos.logback" % "logback-classic" % "1.5.6",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.16.1",
-  "org.projectlombok" % "lombok" % "1.18.32",
+  "org.projectlombok" % "lombok" % "1.18.34",
   "org.springframework" % "spring-context" % "6.1.10"
 )
 
