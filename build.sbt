@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.5.8",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.17.2",
   "org.projectlombok" % "lombok" % "1.18.34",
-  "org.springframework" % "spring-context" % "6.1.12"
+  "org.springframework" % "spring-context" % "6.1.13"
 )
 
 resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/")
