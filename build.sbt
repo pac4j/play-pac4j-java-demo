@@ -7,7 +7,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 scalaVersion := "3.3.4"
 
 val playPac4jVersion = "12.0.2-PLAY3.0"
-val pac4jVersion = "6.1.2"
+val pac4jVersion = "6.1.3"
 val playVersion = "3.0.7"
 
 libraryDependencies += guice
