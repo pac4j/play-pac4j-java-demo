@@ -6,10 +6,10 @@ This `play-pac4j-java-demo` project is a Java Play framework web app to test the
 
 ## Start & test
 
-Build the project and launch the Play app on [http://localhost:9000](http://localhost:9000):
+Build the project with [sbt](https://www.scala-sbt.org/) and launch the Play app on [http://localhost:9000](http://localhost:9000):
 
     cd play-pac4j-java-demo
-    bin\activator run
+    sbt run
 
 ## Live demo
 
