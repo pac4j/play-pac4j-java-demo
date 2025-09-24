@@ -10,16 +10,36 @@ echo "🚀 Starting play-pac4j-java-demo..."
 # Go to project directory (one level up from ci/)
 cd ..
 
+# Determine which sbt command to use
+if command -v sbt >/dev/null 2>&1; then
+    SBT_CMD="sbt"
+    echo "🛠️  Using system SBT command: $SBT_CMD"
+else
+    echo "📥 sbt command not found, using sbt wrapper..."
+    # Download sbt launcher if not exists
+    if [ ! -f "sbt" ]; then
+        echo "📥 Downloading sbt launcher..."
+        curl -L -o sbt "https://raw.githubusercontent.com/sbt/sbt/v1.9.6/sbt"
+        chmod +x sbt
+    fi
+    SBT_CMD="./sbt"
+    echo "🛠️  Using downloaded SBT wrapper: $SBT_CMD"
+fi
+
+# Clean any existing sbt processes to avoid conflicts
+echo "🧹 Cleaning up any existing sbt processes..."
+pkill -f "sbt" >/dev/null 2>&1 || true
+
 # Clean and compile project
 echo "📦 Compiling project..."
-sbt clean compile
+$SBT_CMD clean compile
 
 # Ensure target directory exists
 mkdir -p target
 
 # Start server in background
 echo "🌐 Starting server..."
-sbt run > target/server.log 2>&1 &
+$SBT_CMD run > target/server.log 2>&1 &
 SERVER_PID=$!
 
 # Wait for server to start (maximum 60 seconds)
