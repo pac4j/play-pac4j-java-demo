@@ -7,8 +7,22 @@ set -e  # Stop script on error
 
 echo "🚀 Starting play-pac4j-java-demo..."
 
-# Go to project directory (one level up from ci/)
-cd ..
+# Determine the correct project directory
+# If we're in the ci/ directory, go up one level
+# If we're already at the root (CI case), stay here
+if [ -f "build.sbt" ]; then
+    echo "📂 Already in project root directory"
+else
+    if [ -f "../build.sbt" ]; then
+        echo "📂 Moving from ci/ to project root directory"
+        cd ..
+    else
+        echo "❌ Cannot find build.sbt file. Current directory: $(pwd)"
+        echo "📋 Directory contents:"
+        ls -la
+        exit 1
+    fi
+fi
 
 # Determine which sbt command to use
 if command -v sbt >/dev/null 2>&1; then
