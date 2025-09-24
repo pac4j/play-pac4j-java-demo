@@ -39,7 +39,9 @@ libraryDependencies ++= Seq(
   "org.springframework" % "spring-context" % "6.2.11"
 )
 
-resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/", "Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/")
+resolvers ++= Seq(Resolver.mavenLocal, "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/",
+"Shibboleth releases" at "https://build.shibboleth.net/nexus/content/repositories/releases/",
+"Central Portal Snapshots" at "https://central.sonatype.com/repository/maven-snapshots/")
 resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/ivy-releases/"
 
 routesGenerator := InjectedRoutesGenerator
