@@ -10,7 +10,3 @@ Build the project with [sbt](https://www.scala-sbt.org/) and launch the Play app
 
     cd play-pac4j-java-demo
     sbt run
-
-## Live demo
-
-Find a live demo on Heroku: [https://play-pac4j-java-demo.herokuapp.com](https://play-pac4j-java-demo.herokuapp.com/)
