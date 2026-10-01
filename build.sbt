@@ -44,4 +44,7 @@ resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/ivy-re
 
 routesGenerator := InjectedRoutesGenerator
 
+// JDK 23+ disables implicit annotation processing (needed by Lombok)
+javacOptions += "-proc:full"
+
 ThisBuild / evictionErrorLevel := Level.Info
