@@ -50,7 +50,7 @@ If the script fails:
 1. Check the server logs in `target/server.log`
 2. Review the HTML files saved in `target/` for debugging
 3. Ensure port 9000 is available
-4. Verify internet access to `casserverpac4j.herokuapp.com`
+4. Verify internet access to `www.casserverpac4j.dev`
 
 ### Exit codes
 
